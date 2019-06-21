@@ -17,7 +17,10 @@ public class Agent {
 	public Agent(String name) {
 		this.name=name;
 	}
-
+	   public Agent()
+	   {
+		   
+	   }
 	public String getName() {
 		return name;
 	}

@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
- <?import javafxml_web.*?>
- <?import java.lang.*?>
+
+<?import java.lang.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.IA.decision.multiAgents.Controllers.AgentController"
->
-    <HBox>
-        <Label text="Country:"/>
-        <ComboBox fx:id="countriesComboBox"/>
-    </HBox>
+<?import javafxml_web.*?>
+
+<AnchorPane prefHeight="654.9609375" prefWidth="434.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.IA.decision.multiAgents.Controllers.AgentController">
+  <HBox />
+  <Button fx:id="saveAgent" layoutX="321.0" layoutY="154.0" mnemonicParsing="false" text="Save" />
+  <ComboBox fx:id="agentsComboBox" layoutX="85.0" layoutY="21.0" />
+  <Label layoutX="47.0" layoutY="21.0" text="Agents" />
+  <TextField fx:id="agentName" layoutX="121.0" layoutY="119.0" prefWidth="200.0" promptText="Enter the agent name" />
+  <Label layoutX="38.0" layoutY="119.0" prefHeight="22.0" prefWidth="83.0" text="Agent Name" />
 </AnchorPane>
