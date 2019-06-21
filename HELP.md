@@ -9,5 +9,8 @@ For further reference, please consider the following sections:
 The following guides illustrate how to use some features concretely:
 
 * [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
-installing javafx scene builder
+installing javafx scene builder:
 https://o7planning.org/en/10621/install-javafx-scene-builder-into-eclipse#a2732945
+
+configuring javafx with spring boot:
+https://wimdeblauwe.wordpress.com/2017/09/18/using-spring-boot-with-javafx/
