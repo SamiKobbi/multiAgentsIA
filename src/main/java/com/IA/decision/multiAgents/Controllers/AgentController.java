@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.IA.decision.multiAgents.BO.Agent;
+import com.IA.decision.multiAgents.BO.Goal;
 import com.IA.decision.multiAgents.BO.OCEAN;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
 import com.IA.decision.multiAgents.repositories.OCEANRepository;
@@ -38,6 +39,14 @@ public class AgentController {
 	 	public TextField agreeableness;
 	 	@FXML
 	 	public TextField neuroticism;
+	 	@FXML
+	 	public TextField goalName;
+		@FXML
+	 	public TextField goalWeight;
+	 	@FXML
+	    public ComboBox<Goal> goalComboBox;
+	 	@FXML
+	    public Button saveGoal;
 	    @Autowired
 	    private AgentRepository agentRepo;
 	    @Autowired
@@ -47,6 +56,8 @@ public class AgentController {
 	    	agentsComboBox.setConverter(new AgentNameStringConverter());
 	    	agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 	    	agentsComboBox.getSelectionModel().selectFirst();
+	    	
+	    	
 	    	
 	    	saveAgent.setOnAction(event -> {
 				 
@@ -74,7 +85,9 @@ public class AgentController {
 						 
 					 }
 				 });
-			 });
+			 
+	    	
+	    	});
 	    	
 	    }
 	    
