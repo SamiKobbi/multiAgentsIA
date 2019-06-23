@@ -8,11 +8,39 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafxml_web.*?>
 
-<AnchorPane prefHeight="654.9609375" prefWidth="434.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.IA.decision.multiAgents.Controllers.AgentController">
-  <HBox />
-  <Button fx:id="saveAgent" layoutX="321.0" layoutY="154.0" mnemonicParsing="false" text="Save" />
-  <ComboBox fx:id="agentsComboBox" layoutX="85.0" layoutY="21.0" />
-  <Label layoutX="47.0" layoutY="21.0" text="Agents" />
-  <TextField fx:id="agentName" layoutX="121.0" layoutY="119.0" prefWidth="200.0" promptText="Enter the agent name" />
-  <Label layoutX="38.0" layoutY="119.0" prefHeight="22.0" prefWidth="83.0" text="Agent Name" />
+<AnchorPane prefHeight="800.0" prefWidth="987.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.IA.decision.multiAgents.Controllers.AgentController">
+   <children>
+     <HBox />
+     <Button fx:id="saveAgent" layoutX="600.0" layoutY="762.0" mnemonicParsing="false" text="Save" />
+     <ComboBox fx:id="agentsComboBox" layoutX="181.0" layoutY="27.0" prefHeight="31.0" prefWidth="86.0" />
+     <TextField fx:id="agentName" layoutX="157.0" layoutY="115.0" prefWidth="200.0" promptText="Enter the agent name" />
+     <Label layoutX="38.0" layoutY="119.0" prefHeight="22.0" prefWidth="106.0" text="Agent Name" />
+      <TabPane layoutX="25.0" layoutY="234.0" prefHeight="200.0" prefWidth="688.0" style="-fx-pref-width: 600; -fx-pref-height: 500;" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="OCEAN">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="190.0" prefWidth="600.0" style="-fx-pref-width: 800;">
+                     <children>
+                        <TextField fx:id="openness" layoutX="135.0" layoutY="14.0" />
+                        <Label layoutX="43.0" layoutY="19.0" text="Openness" />
+                        <Label layoutY="71.0" text="Conscientiousness" />
+                        <TextField fx:id="conscientiousness" layoutX="135.0" layoutY="66.0" />
+                        <TextField fx:id="extraversion" layoutX="135.0" layoutY="130.0" />
+                        <TextField fx:id="agreeableness" layoutX="135.0" layoutY="193.0" />
+                        <TextField fx:id="neuroticism" layoutX="135.0" layoutY="259.0" />
+                        <Label layoutX="43.0" layoutY="135.0" text="Extraversion" />
+                        <Label layoutX="25.0" layoutY="198.0" text="Agreeableness" />
+                        <Label layoutX="43.0" layoutY="264.0" text="Neuroticism" />
+                     </children></AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Untitled Tab 2">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+     <Label layoutX="51.0" layoutY="29.0" text="Agents" />
+   </children>
 </AnchorPane>

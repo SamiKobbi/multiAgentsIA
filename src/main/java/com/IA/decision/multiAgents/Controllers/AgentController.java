@@ -6,11 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.IA.decision.multiAgents.BO.Agent;
+import com.IA.decision.multiAgents.BO.OCEAN;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
+import com.IA.decision.multiAgents.repositories.OCEANRepository;
 
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -27,23 +28,54 @@ public class AgentController {
 	    public Button saveAgent;
 	 	@FXML
 	 	public TextField agentName;
+	 	@FXML
+	 	public TextField openness;
+	 	@FXML
+	 	public TextField conscientiousness;
+	 	@FXML
+	 	public TextField extraversion;
+	 	@FXML
+	 	public TextField agreeableness;
+	 	@FXML
+	 	public TextField neuroticism;
 	    @Autowired
 	    private AgentRepository agentRepo;
-	 
+	    @Autowired
+	    private OCEANRepository OCEANRepo;
 	    @FXML
 	    public void initialize() {
 	    	agentsComboBox.setConverter(new AgentNameStringConverter());
 	    	agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 	    	agentsComboBox.getSelectionModel().selectFirst();
-	    	saveAgent.setOnAction(new EventHandler<ActionEvent>() {
-	             @Override
-	             public void handle(ActionEvent event) {
-	                 agentRepo.save(new Agent(agentName.getText()));
-	             }
-	         });
-	    	agentsComboBox.setOnAction((e) -> {
-	             System.out.println("ssssss");
-	    		});
+	    	
+	    	saveAgent.setOnAction(event -> {
+				 
+			     Agent agent = agentRepo.save(new Agent(agentName.getText()));
+			     OCEAN ocean = new OCEAN(
+			    		Double.parseDouble(openness.getText()) , 
+			    		Double.parseDouble(conscientiousness.getText()) , 
+			    		Double.parseDouble(extraversion.getText()) ,
+			    		Double.parseDouble(agreeableness.getText()) ,
+			    		Double.parseDouble(neuroticism.getText())); 
+			     ocean.setAgent(agent);
+			     OCEANRepo.save(ocean);
+			     agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
+			     agentsComboBox.getSelectionModel().selectFirst();
+			     agentsComboBox.valueProperty().addListener((ChangeListener<Agent>) (ov, oldValue, newAgent) -> {
+					
+					 if(newAgent != null)
+					 {
+						 OCEAN oceanByAgent = OCEANRepo.findByAgent(newAgent);
+						 openness.setText(oceanByAgent.getOpenness().toString());
+						 conscientiousness.setText(oceanByAgent.getConscientiousness().toString());
+						 extraversion.setText(oceanByAgent.getExtraversion().toString());
+						 agreeableness.setText(oceanByAgent.getAgreeableness().toString());
+						 neuroticism.setText(oceanByAgent.getNeuroticism().toString());
+						 
+					 }
+				 });
+			 });
+	    	
 	    }
 	    
 	    private static class AgentNameStringConverter extends StringConverter<Agent> {
