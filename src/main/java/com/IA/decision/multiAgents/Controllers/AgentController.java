@@ -58,6 +58,12 @@ public class AgentController {
 	    	agentsComboBox.getSelectionModel().selectFirst();
 	    	
 	    	
+	    	saveGoal.setOnAction(event -> {
+	    		
+	    		Goal goal = new Goal(goalName.getText(),Double.parseDouble(goalWeight.getText()));
+	    		
+	    		
+	    	});
 	    	
 	    	saveAgent.setOnAction(event -> {
 				 

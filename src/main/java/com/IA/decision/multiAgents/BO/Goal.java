@@ -20,6 +20,10 @@ public class Goal {
 	{
 		
 	}
+	public Goal(String goalName, double goalWeight) {
+	   this.name = goalName;
+	   this.weight = goalWeight;
+	}
 	public void setAgent(Agent agent) {
 		this.agent = agent;
 	}
