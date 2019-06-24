@@ -1,0 +1,38 @@
+
+Spring framework est un framework java opensource concu pour faciliter le developpement des applications web et desktop grace à spring core et ainsi ses difféérents modules telsque le spring jdbc/jms/transactions/AOP.
+Spring architecture:
+
+Le conteneur Spring est au cœur du framework Spring. Le conteneur créera les objets, assurera la liaison de beans et gérera leur cycle de vie complet, de la création à la destruction. Le conteneur Spring utilise DI pour gérer les composants qui constituent une application. Ces objets sont appelés spring beans.
+
+ 
+
+1-Bean scopes :
+
+singleteon: stateless.
+prototype: statefull.
+request:  a single bean instance par une requete HTTP.
+session: un seul bean par une session HTTP.
+global session - un seul bean  par une Session HTTP globale. valable pour un contexte portlet
+
+L’injection de dépendances se fait par deux méthodes :
+-La première est basée sur l’utilisation de constructeur et la deuxième par des setters.
+-On pourra gérer les dépendances implicitement grâce à l’autowire by name, by type ou by constructor(constructor-arg)
+@Autowired to autowire(or search) by-type
+@Qualifier to autowire(or search) by-name
+@Component(value="car")
+public class Car implements Vehicle {
+@Component(value="bike")
+public class Bike implements Vehicle {
+NoUniqueBeanDefinitionException:
+@Autowired
+@Qualifier("bike")
+    private Vehicle vehicle;
+
+
+Bean factory vs application context :
+L’application context(aggressive) est une superclass(lazy) de Bean factory. Elle instancie les beans et le relie quand le container commence ce qui n’est pas le cas de Bean factory qui instancie le bean suite à l’appel getBean.
+
+
+
+
+
