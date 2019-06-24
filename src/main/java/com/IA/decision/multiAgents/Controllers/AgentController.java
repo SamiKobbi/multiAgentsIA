@@ -70,6 +70,8 @@ public class AgentController {
 	    		Agent  agent = agentsComboBox.getSelectionModel().getSelectedItem();
 	    		goal.setAgent(agent);
 	    		goalRepo.save(goal);
+	    	 	goalComboBox.setItems(FXCollections.observableArrayList(goalRepo.findByAgent(agentsComboBox.getSelectionModel().getSelectedItem())));
+	    	 	goalComboBox.getSelectionModel().selectFirst();
 	    		
 	    	});
 	    	
