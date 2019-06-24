@@ -9,6 +9,7 @@ import com.IA.decision.multiAgents.BO.Agent;
 import com.IA.decision.multiAgents.BO.Goal;
 import com.IA.decision.multiAgents.BO.OCEAN;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
+import com.IA.decision.multiAgents.repositories.GoalRepository;
 import com.IA.decision.multiAgents.repositories.OCEANRepository;
 
 import javafx.beans.value.ChangeListener;
@@ -51,17 +52,24 @@ public class AgentController {
 	    private AgentRepository agentRepo;
 	    @Autowired
 	    private OCEANRepository OCEANRepo;
+	    @Autowired
+	    private GoalRepository goalRepo;
 	    @FXML
 	    public void initialize() {
 	    	agentsComboBox.setConverter(new AgentNameStringConverter());
+	    	goalComboBox.setConverter(new GoalNameStringConverter());
+	    	
 	    	agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 	    	agentsComboBox.getSelectionModel().selectFirst();
 	    	
+	    	goalComboBox.setItems(FXCollections.observableArrayList(goalRepo.findByAgent(agentsComboBox.getSelectionModel().getSelectedItem())));
 	    	
 	    	saveGoal.setOnAction(event -> {
 	    		
 	    		Goal goal = new Goal(goalName.getText(),Double.parseDouble(goalWeight.getText()));
-	    		
+	    		Agent  agent = agentsComboBox.getSelectionModel().getSelectedItem();
+	    		goal.setAgent(agent);
+	    		goalRepo.save(goal);
 	    		
 	    	});
 	    	
@@ -105,6 +113,17 @@ public class AgentController {
 	 
 	        @Override
 	        public Agent fromString(String string) {
+	            return null;
+	        }
+	    }
+	    private static class GoalNameStringConverter extends StringConverter<Goal> {
+	        @Override
+	        public String toString(Goal object) {
+	            return object.getName();
+	        }
+	 
+	        @Override
+	        public Goal fromString(String string) {
 	            return null;
 	        }
 	    }
