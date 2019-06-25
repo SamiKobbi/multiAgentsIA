@@ -9,5 +9,4 @@ import com.IA.decision.multiAgents.BO.Agent;
 @Repository
 public interface AgentRepository extends JpaRepository<Agent, Long> {
 
-	
 }

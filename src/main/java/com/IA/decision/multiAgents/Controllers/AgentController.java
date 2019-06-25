@@ -1,6 +1,8 @@
 package com.IA.decision.multiAgents.Controllers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,22 +64,22 @@ public class AgentController {
 	    	agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 	    	agentsComboBox.getSelectionModel().selectFirst();
 	    	
-	    	goalComboBox.setItems(FXCollections.observableArrayList(goalRepo.findByAgent(agentsComboBox.getSelectionModel().getSelectedItem())));
-	    	
+	 
+	    	goalComboBox.getSelectionModel().selectFirst();
 	    	saveGoal.setOnAction(event -> {
 	    		
 	    		Goal goal = new Goal(goalName.getText(),Double.parseDouble(goalWeight.getText()));
-	    		Agent  agent = agentsComboBox.getSelectionModel().getSelectedItem();
-	    		goal.setAgent(agent);
-	    		goalRepo.save(goal);
-	    	 	goalComboBox.setItems(FXCollections.observableArrayList(goalRepo.findByAgent(agentsComboBox.getSelectionModel().getSelectedItem())));
-	    	 	goalComboBox.getSelectionModel().selectFirst();
+	    		goalComboBox.getItems().add(goal);
+	    		
+	    			
 	    		
 	    	});
 	    	
 	    	saveAgent.setOnAction(event -> {
 				 
 			     Agent agent = agentRepo.save(new Agent(agentName.getText()));
+			     agentsComboBox.getItems().add(agent);
+			     goalComboBox.getItems().stream().forEach(goalCombo->{goalCombo.setAgent(agent);});
 			     OCEAN ocean = new OCEAN(
 			    		Double.parseDouble(openness.getText()) , 
 			    		Double.parseDouble(conscientiousness.getText()) , 
@@ -86,24 +88,26 @@ public class AgentController {
 			    		Double.parseDouble(neuroticism.getText())); 
 			     ocean.setAgent(agent);
 			     OCEANRepo.save(ocean);
-			     agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
-			     agentsComboBox.getSelectionModel().selectFirst();
-			     agentsComboBox.valueProperty().addListener((ChangeListener<Agent>) (ov, oldValue, newAgent) -> {
-					
-					 if(newAgent != null)
-					 {
-						 OCEAN oceanByAgent = OCEANRepo.findByAgent(newAgent);
-						 openness.setText(oceanByAgent.getOpenness().toString());
-						 conscientiousness.setText(oceanByAgent.getConscientiousness().toString());
-						 extraversion.setText(oceanByAgent.getExtraversion().toString());
-						 agreeableness.setText(oceanByAgent.getAgreeableness().toString());
-						 neuroticism.setText(oceanByAgent.getNeuroticism().toString());
-						 
-					 }
-				 });
-			 
+			    List<Goal> goals = goalComboBox.getItems();
+			     goalRepo.saveAll(goals);
+			     //agentsComboBox.getSelectionModel().clearSelection();
+			     goalComboBox.getItems().clear();
 	    	
 	    	});
+		     agentsComboBox.valueProperty().addListener((ChangeListener<Agent>) (ov, oldValue, newAgent) -> {
+					
+						 if(newAgent != null)
+						 {
+							 OCEAN oceanByAgent = OCEANRepo.findByAgent(newAgent);
+							 openness.setText(oceanByAgent.getOpenness().toString());
+							 conscientiousness.setText(oceanByAgent.getConscientiousness().toString());
+							 extraversion.setText(oceanByAgent.getExtraversion().toString());
+							 agreeableness.setText(oceanByAgent.getAgreeableness().toString());
+							 neuroticism.setText(oceanByAgent.getNeuroticism().toString());
+							 goalComboBox.setItems(FXCollections.observableArrayList(goalRepo.findByAgent(newAgent)));
+							 
+						 }
+					 });
 	    	
 	    }
 	    
