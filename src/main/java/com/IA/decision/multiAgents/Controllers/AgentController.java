@@ -17,6 +17,7 @@ import com.IA.decision.multiAgents.repositories.OCEANRepository;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -76,7 +77,10 @@ public class AgentController {
 	    	});
 	    	
 	    	saveAgent.setOnAction(event -> {
-				 
+				 if(validate())
+				 {
+					 
+				
 			     Agent agent = agentRepo.save(new Agent(agentName.getText()));
 			     agentsComboBox.getItems().add(agent);
 			     goalComboBox.getItems().stream().forEach(goalCombo->{goalCombo.setAgent(agent);});
@@ -90,8 +94,16 @@ public class AgentController {
 			     OCEANRepo.save(ocean);
 			    List<Goal> goals = goalComboBox.getItems();
 			     goalRepo.saveAll(goals);
-			     //agentsComboBox.getSelectionModel().clearSelection();
-			     goalComboBox.getItems().clear();
+			     clearSelection();
+				 }
+				 else
+				 {
+					   Alert alert = new Alert(Alert.AlertType.INFORMATION);
+					    alert.setTitle("Validation Failed");
+					    alert.setHeaderText("Missing agent information");
+					    alert.setContentText("Please enter valid information!");
+					    alert.showAndWait();	
+				 }
 	    	
 	    	});
 		     agentsComboBox.valueProperty().addListener((ChangeListener<Agent>) (ov, oldValue, newAgent) -> {
@@ -110,7 +122,27 @@ public class AgentController {
 					 });
 	    	
 	    }
-	    
+	    private Boolean validate()
+	    {
+	    	return goalComboBox.getItems().size()>0 && agentName.getText().trim() != "" 
+	    			&& openness.getText().trim() != "" && conscientiousness.getText().trim() != ""
+	    			&& extraversion.getText().trim() != "" && agreeableness.getText().trim() != ""
+	    			&& neuroticism.getText().trim() != "" ;
+	    }
+	    private void clearSelection()
+	    {
+	    	agentsComboBox.getItems().clear();
+	        goalComboBox.getItems().clear();
+	        agentName.clear();
+		 	openness.clear();
+		 	conscientiousness.clear();
+		 	extraversion.clear();
+		 	agreeableness.clear();
+		 	neuroticism.clear();
+		 	goalName.clear();
+		 	goalWeight.clear();
+	        
+	    }
 	    private static class AgentNameStringConverter extends StringConverter<Agent> {
 	        @Override
 	        public String toString(Agent object) {
