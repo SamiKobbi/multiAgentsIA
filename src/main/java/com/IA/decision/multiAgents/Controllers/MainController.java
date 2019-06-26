@@ -14,6 +14,10 @@ import com.IA.decision.multiAgents.repositories.AgentRepository;
 import com.IA.decision.multiAgents.repositories.GoalRepository;
 import com.IA.decision.multiAgents.repositories.OCEANRepository;
 
+import jade.core.ProfileImpl;
+import jade.core.Runtime;
+import jade.wrapper.AgentContainer;
+import jade.wrapper.AgentController;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -25,10 +29,11 @@ import javafx.util.StringConverter;
 
 
 @Service
-public class AgentController {
+public class MainController {
 	 	@FXML
 	    public ComboBox<Agent> agentsComboBox;
-	 
+	 	@FXML
+	 	public Button goButton;
 	 	@FXML
 	    public Button saveAgent;
 	 	@FXML
@@ -64,16 +69,41 @@ public class AgentController {
 	    	
 	    	agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 	    	agentsComboBox.getSelectionModel().selectFirst();
-	    	
-	 
 	    	goalComboBox.getSelectionModel().selectFirst();
+	    	
+	    	goButton.setOnAction(
+	    			event -> {
+	    	    		
+	    				try {
+							
+							  Runtime rt = Runtime.instance();
+							  ProfileImpl p = new ProfileImpl(false);
+							  AgentContainer container =rt.createAgentContainer(p);
+							  AgentController Agent=null;			
+							  Agent = container.createNewAgent("Diffuseur", "learning.Diffuseur", null);
+							  Agent.start();	
+					
+							  Agent = container.createNewAgent("Agent1", "learning.Agent1", null);
+							  Agent.start();	
+
+							  Agent = container.createNewAgent("Agent2", "learning.Agent2", null);
+							  Agent.start();
+							 
+						
+							  
+							  } catch (Exception any) {
+							    any.printStackTrace();
+							    
+							  }
+							  
+	    	    	}
+	    			);
+	    	
 	    	saveGoal.setOnAction(event -> {
 	    		
 	    		Goal goal = new Goal(goalName.getText(),Double.parseDouble(goalWeight.getText()));
 	    		goalComboBox.getItems().add(goal);
-	    		
-	    			
-	    		
+		    		
 	    	});
 	    	
 	    	saveAgent.setOnAction(event -> {

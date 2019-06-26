@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafxml_web.*?>
 
-<AnchorPane prefHeight="800.0" prefWidth="987.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.IA.decision.multiAgents.Controllers.AgentController">
+<AnchorPane prefHeight="800.0" prefWidth="987.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.IA.decision.multiAgents.Controllers.MainController">
    <children>
      <HBox />
      <Button fx:id="saveAgent" layoutX="589.0" layoutY="734.0" mnemonicParsing="false" text="Save" />
@@ -51,6 +51,6 @@
         </tabs>
       </TabPane>
      <Label layoutX="51.0" layoutY="29.0" text="Agents" />
-      <Button layoutX="722.0" layoutY="597.0" mnemonicParsing="false" text="Button" />
+      <Button layoutX="748.0" layoutY="734.0" mnemonicParsing="false" fx:id="goButton" text="Go" />
    </children>
 </AnchorPane>
