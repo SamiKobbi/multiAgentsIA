@@ -124,14 +124,13 @@ public class AgentController {
 	    }
 	    private Boolean validate()
 	    {
-	    	return goalComboBox.getItems().size()>0 && agentName.getText().trim() != "" 
-	    			&& openness.getText().trim() != "" && conscientiousness.getText().trim() != ""
-	    			&& extraversion.getText().trim() != "" && agreeableness.getText().trim() != ""
-	    			&& neuroticism.getText().trim() != "" ;
+	    	return goalComboBox.getItems().size()>0 && !agentName.getText().trim().equals("") 
+	    			&& !openness.getText().trim().equals("") && !conscientiousness.getText().trim().equals("") 
+	    			&& !extraversion.getText().trim().equals("") && !agreeableness.getText().trim().equals("")
+	    			&& !neuroticism.getText().trim().equals("") ;
 	    }
 	    private void clearSelection()
 	    {
-	    	agentsComboBox.getItems().clear();
 	        goalComboBox.getItems().clear();
 	        agentName.clear();
 		 	openness.clear();

@@ -34,5 +34,36 @@ L’application context(aggressive) est une superclass(lazy) de Bean factory. El
 
 
 
+functional interface : an interface containing a single abstract method
 
 
+
+
+Vos applications Angular 8 seront désormais automatiquement plus performantes,
+ grâce au chargement différentiel.
+
+Lors du chargement différentiel, deux ensembles sont créés lors de la génération pour la production: 
+un ensemble pour les navigateurs modernes prenant 
+en charge ES2015 + et un ensemble pour les anciens navigateurs ne prenant en charge que la version ES5 de JavaScript.
+ Le bon paquet sera chargé automatiquement par le par le navigateur, grâce au support des modules ES6 
+ dans les nouveaux navigateurs.
+
+Cette nouvelle fonctionnalité entraîne l’amélioration la plus importante des performances d’Angular v8. 
+
+Pour bénéficier du chargement différentiel, 
+vous n’avez rien de spécial à faire. La commande ng build avec l’indicateur --prod
+ se chargera de tout regrouper de manière à ce que le chargement différentiel fonctionne immédiatement:
+
+
+Importations dynamiques pour les itinéraires paresseux
+
+Lazy-loaded routes  utilisent désormais la syntaxe d'importation dynamique standard. Cela signifie que TypeScript 
+seront mieux en mesure de se plaindre lorsque des modules sont manquants ou mal orthographiés.
+
+De
+
+{chemin: '/ cart', loadChildren: './cart/cart.module#CartModule'}
+A
+
+{chemin: `/ cart`, loadChildren: () => import (`. / cart / cart.module`) .then (m => m.CartModule)}
+Le changement de syntaxe sera pris en charge pour vous si vous utilisez la commande ng upgrade pour mettre à niveau votre application.
