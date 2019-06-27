@@ -11,9 +11,11 @@ import com.IA.decision.multiAgents.BO.Agent;
 import com.IA.decision.multiAgents.BO.Event;
 import com.IA.decision.multiAgents.BO.Goal;
 import com.IA.decision.multiAgents.BO.OCEAN;
+import com.IA.decision.multiAgents.repositories.ActionRepository;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
 import com.IA.decision.multiAgents.repositories.EventRepository;
 import com.IA.decision.multiAgents.repositories.GoalRepository;
+import com.IA.decision.multiAgents.repositories.OCCRepository;
 import com.IA.decision.multiAgents.repositories.OCEANRepository;
 
 import jade.core.ProfileImpl;
@@ -25,6 +27,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
@@ -32,12 +35,13 @@ import javafx.util.StringConverter;
 
 @Service
 public class MainController {
-	 	@FXML
-	    public ComboBox<Agent> agentsComboBox;
+	//agent
 	 	@FXML
 	 	public Button goButton;
 	 	@FXML
-	    public Button saveAgent;
+	    public Button saveAgent;	
+	 	@FXML
+	    public ComboBox<Agent> agentsComboBox;
 	 	@FXML
 	 	public TextField agentName;
 	 	@FXML
@@ -50,24 +54,74 @@ public class MainController {
 	 	public TextField agreeableness;
 	 	@FXML
 	 	public TextField neuroticism;
+	//agent
+		
+	 	
+	//goal 	
 	 	@FXML
-	 	public TextField goalName;
-		@FXML
-	 	public TextField goalWeight;
+	    public Button saveGoal;
 	 	@FXML
 	    public ComboBox<Goal> goalComboBox;
 	 	@FXML
-	    public Button saveGoal;
+	 	public TextField goalName;
+	 	@FXML
+	 	public TextField goalWeight;	
+	 //goal	 	
+	 	
+	 
+	 //event 		
+	 	@FXML
+	 	public TextField eventName;
+		@FXML
+	 	public TextField eventIntensity;
+	 	@FXML
+	    public CheckBox confirmCheckBox;
+	 	@FXML
+	    public CheckBox degreeCheckBox;
+	 	@FXML
+	 	public ComboBox<Agent> eventAgent;
+	 	@FXML
+	 	public TextField eventReaction;
+	 	@FXML
+	    public Button addEvent;
+	 //event 
+
+	 	
+	 //Action	
+	 	@FXML
+	 	public ComboBox<Agent> agentSrc;
+	 	@FXML
+	 	public ComboBox<Agent> agentDest;
+	 	@FXML
+	 	public TextField actionMessage;
+	 	@FXML
+	 	public TextField actionApprDegLvl;	
+	 	@FXML
+	    public CheckBox reqCheckbox;
+	 	@FXML
+	    public CheckBox resCheckbox;
+	 	@FXML
+	    public CheckBox actionDeg;
+	 	@FXML
+	 	public ComboBox<Agent> actionComboBox;
+	 	@FXML
+	    public Button addAction;
+	 //Action		
+	 	
 	 	
 	 	@Autowired
 	 	private EventRepository eventRepo;
-	 	
+	 	@Autowired
+	 	private OCCRepository OCCRepo;
+	 	@Autowired
+	 	private ActionRepository actionRepo;
 	    @Autowired
 	    private AgentRepository agentRepo;
 	    @Autowired
 	    private OCEANRepository OCEANRepo;
 	    @Autowired
 	    private GoalRepository goalRepo;
+	    
 	    @FXML
 	    public void initialize() {
 	    	agentsComboBox.setConverter(new AgentNameStringConverter());
@@ -80,51 +134,34 @@ public class MainController {
 	    	goButton.setOnAction(
 	    			event -> {
 	    	    		
-	    				Agent agent = new Agent("sami");
-	    				
-	    				Goal goal = new Goal("succeed the exam", 0.5);
-	    				goal.setAgent(agent);
-	    				
-	    				Event ev = new Event("Exams will be difficult",false,false,0.3);
-
-	    				ev.setGoal(goal);
-	    				
-	    				agentRepo.save(agent);
-	    				goalRepo.save(goal);
-	    				eventRepo.save(ev);
-//	    				try {
-//							
-//							  Runtime rt = Runtime.instance();
-//							  ProfileImpl p = new ProfileImpl(false);
-//							  AgentContainer container =rt.createAgentContainer(p);
-//							  AgentController Agent=null;			
-//							  Agent = container.createNewAgent("Diffuseur", "learning.Diffuseur", null);
-//							  Agent.start();	
-//					
-//							  Agent = container.createNewAgent("Agent1", "learning.Agent1", null);
-//							  Agent.start();	
+//	    				Agent agent = new Agent("sami");
+//	    				
+//	    				Goal goal = new Goal("succeed the exam", 0.5);
+//	    				goal.setAgent(agent);
+//	    				
+//	    				Event ev = new Event("Exams will be difficult",false,false,0.3);
 //
-//							  Agent = container.createNewAgent("Agent2", "learning.Agent2", null);
-//							  Agent.start();
-//							 
-//						
-//							  
-//							  } catch (Exception any) {
-//							    any.printStackTrace();    
-//							  }
-							  
+//	    				ev.setGoal(goal);
+//	    				
+//	    				agentRepo.save(agent);
+//	    				goalRepo.save(goal);
+//	    				eventRepo.save(ev);	  
 	    	    	}
 	    			);
 	    	
 	    	saveGoal.setOnAction(event -> {
 	    		
 	    		Goal goal = new Goal(goalName.getText(),Double.parseDouble(goalWeight.getText()));
+	    		Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
+	    		goal.setAgent(agent);
 	    		goalComboBox.getItems().add(goal);
+			    goalRepo.saveAll(goalComboBox.getItems());
+
 		    		
 	    	});
 	    	
 	    	saveAgent.setOnAction(event -> {
-				 if(validate())
+				 if(validateAgent())
 				 {
 					 
 				
@@ -139,9 +176,7 @@ public class MainController {
 			    		Double.parseDouble(neuroticism.getText())); 
 			     ocean.setAgent(agent);
 			     OCEANRepo.save(ocean);
-			    List<Goal> goals = goalComboBox.getItems();
-			     goalRepo.saveAll(goals);
-			     clearSelection();
+			     clearSelectionAgent();
 				 }
 				 else
 				 {
@@ -169,16 +204,15 @@ public class MainController {
 					 });
 	    	
 	    }
-	    private Boolean validate()
+	    private Boolean validateAgent()
 	    {
-	    	return goalComboBox.getItems().size()>0 && !agentName.getText().trim().equals("") 
+	    	return 	!agentName.getText().trim().equals("") 
 	    			&& !openness.getText().trim().equals("") && !conscientiousness.getText().trim().equals("") 
 	    			&& !extraversion.getText().trim().equals("") && !agreeableness.getText().trim().equals("")
 	    			&& !neuroticism.getText().trim().equals("") ;
 	    }
-	    private void clearSelection()
+	    private void clearSelectionAgent()
 	    {
-	        goalComboBox.getItems().clear();
 	        agentName.clear();
 		 	openness.clear();
 		 	conscientiousness.clear();
@@ -186,8 +220,11 @@ public class MainController {
 		 	agreeableness.clear();
 		 	neuroticism.clear();
 		 	goalName.clear();
-		 	goalWeight.clear();
-	        
+		 	goalWeight.clear();   
+	    }
+	    private void clearSelectionGoal()
+	    {
+	    	goalComboBox.getItems().clear();
 	    }
 	    private static class AgentNameStringConverter extends StringConverter<Agent> {
 	        @Override
