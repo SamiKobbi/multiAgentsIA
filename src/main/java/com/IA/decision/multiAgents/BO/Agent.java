@@ -10,7 +10,7 @@ import javax.persistence.OneToOne;
 @Entity
 public class Agent {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	private String name;

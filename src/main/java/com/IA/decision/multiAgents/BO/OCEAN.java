@@ -10,7 +10,7 @@ import javax.persistence.OneToOne;
 @Entity
 public class OCEAN {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
 

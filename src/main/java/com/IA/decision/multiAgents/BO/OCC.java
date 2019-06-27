@@ -9,7 +9,7 @@ import javax.persistence.OneToOne;
 @Entity
 public class OCC {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	@OneToOne
 	private Agent agent;

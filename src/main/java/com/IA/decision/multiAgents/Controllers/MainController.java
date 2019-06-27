@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.IA.decision.multiAgents.BO.Agent;
+import com.IA.decision.multiAgents.BO.Event;
 import com.IA.decision.multiAgents.BO.Goal;
 import com.IA.decision.multiAgents.BO.OCEAN;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
+import com.IA.decision.multiAgents.repositories.EventRepository;
 import com.IA.decision.multiAgents.repositories.GoalRepository;
 import com.IA.decision.multiAgents.repositories.OCEANRepository;
 
@@ -56,6 +58,10 @@ public class MainController {
 	    public ComboBox<Goal> goalComboBox;
 	 	@FXML
 	    public Button saveGoal;
+	 	
+	 	@Autowired
+	 	private EventRepository eventRepo;
+	 	
 	    @Autowired
 	    private AgentRepository agentRepo;
 	    @Autowired
@@ -74,27 +80,38 @@ public class MainController {
 	    	goButton.setOnAction(
 	    			event -> {
 	    	    		
-	    				try {
-							
-							  Runtime rt = Runtime.instance();
-							  ProfileImpl p = new ProfileImpl(false);
-							  AgentContainer container =rt.createAgentContainer(p);
-							  AgentController Agent=null;			
-							  Agent = container.createNewAgent("Diffuseur", "learning.Diffuseur", null);
-							  Agent.start();	
-					
-							  Agent = container.createNewAgent("Agent1", "learning.Agent1", null);
-							  Agent.start();	
+	    				Agent agent = new Agent("sami");
+	    				
+	    				Goal goal = new Goal("succeed the exam", 0.5);
+	    				goal.setAgent(agent);
+	    				
+	    				Event ev = new Event("Exams will be difficult",false,false,0.3);
 
-							  Agent = container.createNewAgent("Agent2", "learning.Agent2", null);
-							  Agent.start();
-							 
-						
-							  
-							  } catch (Exception any) {
-							    any.printStackTrace();
-							    
-							  }
+	    				ev.setGoal(goal);
+	    				
+	    				agentRepo.save(agent);
+	    				goalRepo.save(goal);
+	    				eventRepo.save(ev);
+//	    				try {
+//							
+//							  Runtime rt = Runtime.instance();
+//							  ProfileImpl p = new ProfileImpl(false);
+//							  AgentContainer container =rt.createAgentContainer(p);
+//							  AgentController Agent=null;			
+//							  Agent = container.createNewAgent("Diffuseur", "learning.Diffuseur", null);
+//							  Agent.start();	
+//					
+//							  Agent = container.createNewAgent("Agent1", "learning.Agent1", null);
+//							  Agent.start();	
+//
+//							  Agent = container.createNewAgent("Agent2", "learning.Agent2", null);
+//							  Agent.start();
+//							 
+//						
+//							  
+//							  } catch (Exception any) {
+//							    any.printStackTrace();    
+//							  }
 							  
 	    	    	}
 	    			);

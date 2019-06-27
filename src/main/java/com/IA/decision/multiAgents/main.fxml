@@ -11,46 +11,90 @@
 <AnchorPane prefHeight="800.0" prefWidth="987.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.IA.decision.multiAgents.Controllers.MainController">
    <children>
      <HBox />
-     <Button fx:id="saveAgent" layoutX="589.0" layoutY="734.0" mnemonicParsing="false" text="Save" />
-     <ComboBox fx:id="agentsComboBox" layoutX="181.0" layoutY="27.0" prefHeight="31.0" prefWidth="86.0" />
-     <TextField fx:id="agentName" layoutX="157.0" layoutY="115.0" prefWidth="200.0" promptText="Enter the agent name" />
-     <Label layoutX="38.0" layoutY="119.0" prefHeight="22.0" prefWidth="106.0" text="Agent Name" />
-      <TabPane layoutX="25.0" layoutY="234.0" prefHeight="200.0" prefWidth="688.0" style="-fx-pref-width: 600; -fx-pref-height: 500;" tabClosingPolicy="UNAVAILABLE">
+      <TabPane layoutX="25.0" layoutY="6.0" prefHeight="200.0" prefWidth="688.0" style="-fx-pref-width: 600; -fx-pref-height: 500;" tabClosingPolicy="UNAVAILABLE">
         <tabs>
-          <Tab text="OCEAN">
+          <Tab text="Agents">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="190.0" prefWidth="600.0" style="-fx-pref-width: 800;">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="471.0" prefWidth="742.0" style="-fx-pref-width: 800;">
                      <children>
-                        <TextField fx:id="openness" layoutX="135.0" layoutY="14.0" />
-                        <Label layoutX="43.0" layoutY="19.0" text="Openness" />
-                        <Label layoutY="71.0" text="Conscientiousness" />
-                        <TextField fx:id="conscientiousness" layoutX="135.0" layoutY="66.0" />
-                        <TextField fx:id="extraversion" layoutX="135.0" layoutY="130.0" />
-                        <TextField fx:id="agreeableness" layoutX="135.0" layoutY="193.0" />
-                        <TextField fx:id="neuroticism" layoutX="135.0" layoutY="259.0" />
-                        <Label layoutX="43.0" layoutY="135.0" text="Extraversion" />
-                        <Label layoutX="25.0" layoutY="198.0" text="Agreeableness" />
-                        <Label layoutX="43.0" layoutY="264.0" text="Neuroticism" />
+                        <TextField fx:id="openness" layoutX="120.0" layoutY="165.0" prefHeight="25.0" prefWidth="151.0" />
+                        <Label layoutX="18.0" layoutY="169.0" text="Openness" />
+                        <Label layoutX="10.0" layoutY="219.0" text="Conscientiousness" />
+                        <TextField fx:id="conscientiousness" layoutX="120.0" layoutY="215.0" />
+                        <TextField fx:id="extraversion" layoutX="120.0" layoutY="256.0" />
+                        <TextField fx:id="agreeableness" layoutX="120.0" layoutY="294.0" />
+                        <TextField fx:id="neuroticism" layoutX="120.0" layoutY="327.0" />
+                        <Label layoutX="13.0" layoutY="260.0" text="Extraversion" />
+                        <Label layoutX="12.0" layoutY="298.0" text="Agreeableness" />
+                        <Label layoutX="13.0" layoutY="331.0" text="Neuroticism" />
+                       <Label layoutX="12.0" layoutY="103.0" prefHeight="22.0" prefWidth="106.0" text="Agent Name" />
+                       <TextField fx:id="agentName" layoutX="118.0" layoutY="103.0" prefHeight="25.0" prefWidth="184.0" promptText="Enter the agent name" />
+                       <ComboBox fx:id="agentsComboBox" layoutX="120.0" layoutY="47.0" prefHeight="31.0" prefWidth="179.0" />
+                       <Label layoutX="25.0" layoutY="54.0" text="Agents" />
+                       <Button fx:id="saveAgent" layoutX="307.0" layoutY="384.0" mnemonicParsing="false" text="Save" />
                      </children></AnchorPane>
             </content>
           </Tab>
           <Tab text="Goals">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="473.0" prefWidth="609.0">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="609.0" prefWidth="609.0">
                      <children>
-                        <Label layoutX="50.0" layoutY="144.0" prefHeight="21.0" prefWidth="86.0" text="Name" />
-                        <Label layoutX="50.0" layoutY="210.0" text="Weight" />
-                        <TextField fx:id="goalName" layoutX="113.0" layoutY="139.0" />
-                        <TextField fx:id="goalWeight" layoutX="113.0" layoutY="205.0" />
-                        <Label layoutX="49.0" layoutY="58.0" prefHeight="21.0" prefWidth="51.0" text="Goals" />
-                        <ComboBox fx:id="goalComboBox" layoutX="113.0" layoutY="53.0" prefHeight="31.0" prefWidth="179.0" />
-                        <Button fx:id="saveGoal" layoutX="320.0" layoutY="292.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="86.0" text="Add" />
+                        <Label layoutX="38.0" layoutY="100.0" prefHeight="21.0" prefWidth="86.0" text="Name" />
+                        <Label layoutX="38.0" layoutY="133.0" text="Weight" />
+                        <TextField fx:id="goalName" layoutX="113.0" layoutY="98.0" />
+                        <TextField fx:id="goalWeight" layoutX="113.0" layoutY="129.0" />
+                        <Label layoutX="38.0" layoutY="58.0" prefHeight="21.0" prefWidth="51.0" text="Goals" />
+                        <ComboBox fx:id="goalComboBox" layoutX="113.0" layoutY="56.0" prefHeight="25.0" prefWidth="179.0" />
+                        <TabPane layoutX="38.0" layoutY="179.0" prefHeight="300.0" prefWidth="524.0" tabClosingPolicy="UNAVAILABLE">
+                          <tabs>
+                            <Tab text="Event">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="524.0">
+                                       <children>
+                                          <TextField layoutX="126.0" layoutY="43.0" prefHeight="25.0" prefWidth="236.0" />
+                                          <Label layoutX="34.0" layoutY="47.0" prefHeight="17.0" prefWidth="80.0" text="Name" />
+                                          <CheckBox layoutX="262.0" layoutY="101.0" mnemonicParsing="false" text="Confirmed" />
+                                          <CheckBox layoutX="142.0" layoutY="101.0" mnemonicParsing="false" text="Degree" />
+                                          <Label layoutX="31.0" layoutY="77.0" prefHeight="17.0" prefWidth="48.0" text="Intensity" />
+                                          <TextField layoutX="128.0" layoutY="73.0" prefHeight="25.0" prefWidth="241.0" />
+                                          <TextField layoutX="126.0" layoutY="126.0" prefHeight="25.0" prefWidth="245.0" />
+                                          <Label layoutX="31.0" layoutY="130.0" prefHeight="17.0" prefWidth="86.0" text="Event reaction" />
+                                          <ComboBox layoutX="127.0" layoutY="14.0" prefHeight="25.0" prefWidth="233.0" />
+                                          <Label layoutX="34.0" layoutY="18.0" text="Events" />
+                                          <Button layoutX="392.0" layoutY="174.0" mnemonicParsing="false" text="Add Event" />
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </Tab>
+                            <Tab text="Action">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="524.0">
+                                       <children>
+                                          <TextField layoutX="140.0" layoutY="41.0" prefHeight="12.0" prefWidth="222.0" />
+                                          <TextField layoutX="140.0" layoutY="123.0" prefHeight="25.0" prefWidth="223.0" />
+                                          <CheckBox layoutX="138.0" layoutY="79.0" mnemonicParsing="false" text="Request" />
+                                          <CheckBox layoutX="215.0" layoutY="79.0" mnemonicParsing="false" text="Response" />
+                                          <CheckBox layoutX="296.0" layoutY="79.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="106.0" text="Action Degree" />
+                                          <Label layoutX="16.0" layoutY="36.0" prefHeight="17.0" prefWidth="113.0" text="Message" />
+                                          <Label layoutX="8.0" layoutY="127.0" prefHeight="17.0" prefWidth="130.0" text="Approval degree level" />
+                                          <ComboBox layoutX="140.0" layoutY="2.0" prefHeight="25.0" prefWidth="221.0" />
+                                          <Label layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="98.0" text="Actions" />
+                                          <Label layoutX="18.0" layoutY="168.0" prefHeight="18.0" prefWidth="90.0" text="Agent Source" />
+                                          <Label layoutX="15.0" layoutY="206.0" text="Agent Destination" />
+                                          <ComboBox layoutX="140.0" layoutY="164.0" prefHeight="25.0" prefWidth="216.0" />
+                                          <ComboBox layoutX="140.0" layoutY="202.0" prefHeight="25.0" prefWidth="215.0" />
+                                          <Button layoutX="376.0" layoutY="227.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="86.0" text="Add Action" />
+                                       </children></AnchorPane>
+                              </content>
+                            </Tab>
+                          </tabs>
+                        </TabPane>
                      </children></AnchorPane>
             </content>
           </Tab>
         </tabs>
       </TabPane>
-     <Label layoutX="51.0" layoutY="29.0" text="Agents" />
-      <Button layoutX="748.0" layoutY="734.0" mnemonicParsing="false" fx:id="goButton" text="Go" />
+      <Button fx:id="goButton" layoutX="600.0" layoutY="536.0" mnemonicParsing="false" text="Go" />
+      <Button fx:id="saveGoal" layoutX="451.0" layoutY="536.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="86.0" text="Add Goal" />
    </children>
 </AnchorPane>

@@ -10,6 +10,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import com.IA.decision.multiAgents.BO.Agent;
 import com.IA.decision.multiAgents.Controllers.MainController;
+import com.IA.decision.multiAgents.repositories.AgentRepository;
+
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.wrapper.AgentContainer;
@@ -36,8 +38,7 @@ public class MultiAgentsApplication extends Application {
 
 	private ConfigurableApplicationContext context;
 	private Parent rootNode;
-	@Autowired
-	private MainController agentService;
+
 
 	@Override
 	public void init() throws Exception {
@@ -81,7 +82,7 @@ public class MultiAgentsApplication extends Application {
 		}
 	}
 	public static void main(String[] args) {
-		supervisor();
+		//supervisor();
 		launch(args);
 	}
 	

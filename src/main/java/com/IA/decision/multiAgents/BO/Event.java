@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 public class Event {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	public String getName() {
 		return name;
@@ -20,12 +20,12 @@ public class Event {
 		this.name = name;
 	}
 
-	public String getType() {
-		return type;
+	public Boolean getConfirmed() {
+		return confirmed;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setConfirmed(Boolean confirmed) {
+		this.confirmed = confirmed;
 	}
 
 	public Boolean getEventDegree() {
@@ -52,8 +52,15 @@ public class Event {
 		this.goal = goal;
 	}
 
+	public Event(String name, Boolean confirmed, Boolean eventDegree, Double eventIntensityLevel) {
+		this.name = name;
+		this.confirmed = confirmed;
+		this.eventDegree = eventDegree;
+		this.eventIntensityLevel = eventIntensityLevel;
+	}
+
 	private String name;
-	private String type;
+	private Boolean confirmed;
 	private Boolean eventDegree;
 	private Double eventIntensityLevel;
 	
