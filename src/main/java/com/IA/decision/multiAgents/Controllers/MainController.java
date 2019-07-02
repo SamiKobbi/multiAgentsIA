@@ -25,6 +25,8 @@ import jade.wrapper.AgentController;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -69,7 +71,7 @@ public class MainController {
 	 //goal	 	
 	 	
 	 
-	 //event 		
+	 //event 	
 	 	@FXML
 	 	public TextField eventName;
 		@FXML
@@ -106,8 +108,10 @@ public class MainController {
 	 	public ComboBox<Agent> actionComboBox;
 	 	@FXML
 	    public Button addAction;
-	 //Action		
-	 	
+	 	//Action		
+	 	//reports
+	 	@FXML 
+	 	LineChart emotionsChart;
 	 	
 	 	@Autowired
 	 	private EventRepository eventRepo;
@@ -124,6 +128,21 @@ public class MainController {
 	    
 	    @FXML
 	    public void initialize() {
+
+	        XYChart.Series series = new XYChart.Series();
+	        series.setName("sustain");
+	        //populating the series with data
+	        series.getData().add(new XYChart.Data( 23,"sustain"));
+	        series.getData().add(new XYChart.Data(28 ,"sustain" ));
+	        
+	        XYChart.Series series2 = new XYChart.Series();
+	        series2.setName("terminate");
+	        series2.getData().add(new XYChart.Data( 14, "terminate"));
+	       
+	        series2.getData().add(new XYChart.Data(34, "terminate" ));
+	   
+	        emotionsChart.getData().addAll(series , series2);
+	        
 	    	agentsComboBox.setConverter(new AgentNameStringConverter());
 	    	goalComboBox.setConverter(new GoalNameStringConverter());
 	    	

@@ -82,7 +82,7 @@ public class MultiAgentsApplication extends Application {
 		}
 	}
 	public static void main(String[] args) {
-		//supervisor();
+		supervisor();
 		launch(args);
 	}
 	

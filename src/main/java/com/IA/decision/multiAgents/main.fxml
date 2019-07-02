@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
 <?import java.lang.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
@@ -59,7 +60,7 @@
                                           <TextField fx:id="eventIntensity" layoutX="128.0" layoutY="73.0" prefHeight="25.0" prefWidth="241.0" />
                                           <TextField fx:id="eventReaction" layoutX="126.0" layoutY="126.0" prefHeight="25.0" prefWidth="245.0" />
                                           <Label layoutX="31.0" layoutY="130.0" prefHeight="17.0" prefWidth="86.0" text="Event reaction" />
-                                          <ComboBox fx:id="eventAgent"  layoutX="127.0" layoutY="14.0" prefHeight="25.0" prefWidth="233.0" />
+                                          <ComboBox fx:id="eventAgent" layoutX="127.0" layoutY="14.0" prefHeight="25.0" prefWidth="233.0" />
                                           <Label layoutX="34.0" layoutY="18.0" text="Events" />
                                           <Button fx:id="addEvent" layoutX="392.0" layoutY="174.0" mnemonicParsing="false" text="Add Event" />
                                        </children>
@@ -93,6 +94,23 @@
                      </children></AnchorPane>
             </content>
           </Tab>
+            <Tab text="Reports">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <LineChart fx:id="emotionsChart" layoutX="63.0" layoutY="54.0">
+                          <xAxis>
+                             <NumberAxis side="LEFT" />
+                          </xAxis>
+                          <yAxis>
+                          <CategoryAxis side="BOTTOM" />
+                          
+                          </yAxis>
+                        </LineChart>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
         </tabs>
       </TabPane>
       <Button fx:id="goButton" layoutX="681.0" layoutY="566.0" mnemonicParsing="false" text="Go" />
