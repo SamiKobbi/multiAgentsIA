@@ -105,7 +105,7 @@ public class MainController {
 	 	@FXML
 	    public CheckBox actionDeg;
 	 	@FXML
-	 	public ComboBox<Agent> actionComboBox;
+	 	public ComboBox<Agent> actionAgentComboBox;
 	 	@FXML
 	    public Button addAction;
 	 	//Action		
@@ -145,7 +145,8 @@ public class MainController {
 	        
 	    	agentsComboBox.setConverter(new AgentNameStringConverter());
 	    	goalComboBox.setConverter(new GoalNameStringConverter());
-	    	
+	    	eventAgent.setConverter(new AgentNameStringConverter());
+	    	actionAgentComboBox.setConverter(new AgentNameStringConverter());
 	    	agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 	    	agentsComboBox.getSelectionModel().selectFirst();
 	    	goalComboBox.getSelectionModel().selectFirst();
@@ -167,7 +168,10 @@ public class MainController {
 //	    				eventRepo.save(ev);	  
 	    	    	}
 	    			);
-	    	
+	    	goButton.setOnAction(event -> {
+	    		
+	    		
+	    	});
 	    	saveGoal.setOnAction(event -> {
 	    		
 	    		Goal goal = new Goal(goalName.getText(),Double.parseDouble(goalWeight.getText()));
@@ -178,6 +182,14 @@ public class MainController {
 
 		    		
 	    	});
+	    	
+	    	addEvent.setOnAction(
+	    			event -> {
+	    				
+	    			}
+	    			
+	    			);
+	 
 	    	
 	    	saveAgent.setOnAction(event -> {
 				 if(validateAgent())
@@ -207,6 +219,7 @@ public class MainController {
 				 }
 	    	
 	    	});
+	    	
 		     agentsComboBox.valueProperty().addListener((ChangeListener<Agent>) (ov, oldValue, newAgent) -> {
 					
 						 if(newAgent != null)
