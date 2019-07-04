@@ -74,3 +74,6 @@ Le changement de syntaxe sera pris en charge pour vous si vous utilisez la comma
 
 
 https://saeedkhattak.wordpress.com/2012/02/13/developing-software-with-ejade/
+
+
+java –classpath C:\jade\jade\lib\jade.jar;.  jade.Boot -container buyer:BookBuyerAgent 

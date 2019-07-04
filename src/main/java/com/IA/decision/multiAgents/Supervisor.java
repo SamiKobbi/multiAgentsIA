@@ -1,9 +1,10 @@
-package com.IA.decision.multiAgents.Jade;
+package com.IA.decision.multiAgents;
 
 
 
 
 
+import jade.core.Agent;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.wrapper.AgentContainer;

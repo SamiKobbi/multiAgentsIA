@@ -1,7 +1,11 @@
 package com.IA.decision.multiAgents;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.List;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,7 +17,7 @@ import com.IA.decision.multiAgents.Controllers.MainController;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
 
 import jade.core.ProfileImpl;
-import jade.core.Runtime;
+
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
@@ -68,18 +72,11 @@ public class MultiAgentsApplication extends Application {
 	}
 	public static void supervisor()
 	{
-		try {
-			Runtime rt = Runtime.instance();
-			ProfileImpl p = new ProfileImpl(false);
-			AgentContainer container = rt.createAgentContainer(p);
-			AgentController Agent = null;
-
-			Agent = container.createNewAgent("Supervisor", "learning.Supervisor", null);
-			Agent.start();
-		} catch (StaleProxyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String line = "java -classpath C:/jade/jade/lib/jade.jar jade.Boot -gui";
+    	CommandLine cmdLine = CommandLine.parse(line);
+    	DefaultExecutor executor = new DefaultExecutor();
+    	int exitValue = executor.execute(cmdLine);
+    	
 	}
 	public static void main(String[] args) {
 		supervisor();
