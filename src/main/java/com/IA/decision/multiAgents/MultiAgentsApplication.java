@@ -70,16 +70,9 @@ public class MultiAgentsApplication extends Application {
 	public void stop() throws Exception {
 		context.close();
 	}
-	public static void supervisor()
-	{
-		String line = "java -classpath C:/jade/jade/lib/jade.jar jade.Boot -gui";
-    	CommandLine cmdLine = CommandLine.parse(line);
-    	DefaultExecutor executor = new DefaultExecutor();
-    	int exitValue = executor.execute(cmdLine);
-    	
-	}
+
 	public static void main(String[] args) {
-		supervisor();
+	
 		launch(args);
 	}
 	

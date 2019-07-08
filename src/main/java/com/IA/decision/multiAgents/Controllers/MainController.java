@@ -81,7 +81,7 @@ public class MainController {
 	 	@FXML
 	    public CheckBox degreeCheckBox;
 	 	@FXML
-	 	public ComboBox<Agent> eventAgent;
+	 	public ComboBox<Event> eventComboBox;
 	 	@FXML
 	 	public TextField eventReaction;
 	 	@FXML
@@ -112,7 +112,7 @@ public class MainController {
 	 	//reports
 	 	@FXML 
 	 	LineChart emotionsChart;
-	 	
+		//reports
 	 	@Autowired
 	 	private EventRepository eventRepo;
 	 	@Autowired
@@ -129,23 +129,10 @@ public class MainController {
 	    @FXML
 	    public void initialize() {
 
-	        XYChart.Series series = new XYChart.Series();
-	        series.setName("sustain");
-	        //populating the series with data
-	        series.getData().add(new XYChart.Data( 23,"sustain"));
-	        series.getData().add(new XYChart.Data(28 ,"sustain" ));
-	        
-	        XYChart.Series series2 = new XYChart.Series();
-	        series2.setName("terminate");
-	        series2.getData().add(new XYChart.Data( 14, "terminate"));
-	       
-	        series2.getData().add(new XYChart.Data(34, "terminate" ));
-	   
-	        emotionsChart.getData().addAll(series , series2);
 	        
 	    	agentsComboBox.setConverter(new AgentNameStringConverter());
 	    	goalComboBox.setConverter(new GoalNameStringConverter());
-	    	eventAgent.setConverter(new AgentNameStringConverter());
+	    	eventComboBox.setConverter(new EventNameStringConverter());
 	    	actionAgentComboBox.setConverter(new AgentNameStringConverter());
 	    	agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 	    	agentsComboBox.getSelectionModel().selectFirst();
@@ -169,8 +156,7 @@ public class MainController {
 	    	    	}
 	    			);
 	    	goButton.setOnAction(event -> {
-	    		
-	    		
+	    		System.out.println("Go Clicked");	
 	    	});
 	    	saveGoal.setOnAction(event -> {
 	    		
@@ -182,10 +168,12 @@ public class MainController {
 
 		    		
 	    	});
-	    	
+	    	//public Event(String name, Boolean confirmed, Boolean eventDegree, Double eventIntensityLevel) 
 	    	addEvent.setOnAction(
 	    			event -> {
-	    				
+	    				Event ev = new Event(eventName.getText() , confirmCheckBox.isSelected() , degreeCheckBox.isSelected() , Double.parseDouble(eventIntensity.getText()) );
+	    				ev.setGoal(goalComboBox.getSelectionModel().getSelectedItem());
+	    				eventComboBox.getItems().add(ev);
 	    			}
 	    			
 	    			);
@@ -198,7 +186,7 @@ public class MainController {
 				
 			     Agent agent = agentRepo.save(new Agent(agentName.getText()));
 			     agentsComboBox.getItems().add(agent);
-			     goalComboBox.getItems().stream().forEach(goalCombo->{goalCombo.setAgent(agent);});
+			     //goalComboBox.getItems().stream().forEach(goalCombo->{goalCombo.setAgent(agent);});
 			     OCEAN ocean = new OCEAN(
 			    		Double.parseDouble(openness.getText()) , 
 			    		Double.parseDouble(conscientiousness.getText()) , 
@@ -266,6 +254,17 @@ public class MainController {
 	 
 	        @Override
 	        public Agent fromString(String string) {
+	            return null;
+	        }
+	    }
+	    private static class EventNameStringConverter extends StringConverter<Event> {
+	        @Override
+	        public String toString(Event object) {
+	            return object.getName();
+	        }
+	 
+	        @Override
+	        public Event fromString(String string) {
 	            return null;
 	        }
 	    }
