@@ -59,6 +59,12 @@ public class Action {
 	public Action() {
 
 	}
+	public Action(String message, Boolean actionDegree, Boolean requestOrResponse, Double approvalDegreeLevel) {
+		   this.message = message;
+		   this.actionDegree = actionDegree;
+		   this.requestOrResponse = requestOrResponse;
+		   this.approvalDegreeLevel = approvalDegreeLevel;
+	}
 	private String message;
 	private Boolean actionDegree;
 	private Boolean requestOrResponse;

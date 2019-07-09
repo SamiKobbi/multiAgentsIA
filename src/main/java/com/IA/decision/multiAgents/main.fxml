@@ -90,7 +90,7 @@
                             </Tab>
                           </tabs>
                         </TabPane>
-                        <Button fx:id="saveGoal" layoutX="476.0" layoutY="486.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="86.0" text="Add Goal" />
+                        <Button fx:id="saveGoal" layoutX="330.0" layoutY="150.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="86.0" text="Add Goal" />
                      </children></AnchorPane>
             </content>
           </Tab>
