@@ -127,10 +127,14 @@ public class MainController {
 	public void initialize() {
 
 		agentsComboBox.setConverter(new AgentNameStringConverter());
+		agentSrc.setConverter(new AgentNameStringConverter());
+		agentDest.setConverter(new AgentNameStringConverter());
 		goalComboBox.setConverter(new GoalNameStringConverter());
 		eventComboBox.setConverter(new EventNameStringConverter());
 		actionAgentComboBox.setConverter(new ActionNameStringConverter());
 		agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
+		agentSrc.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
+		agentDest.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentsComboBox.getSelectionModel().selectFirst();
 		goalComboBox.getSelectionModel().selectFirst();
 
@@ -155,6 +159,8 @@ public class MainController {
 			action.setAgentSrc(agentSrc.getSelectionModel().getSelectedItem());
 			action.setAgentDest(agentDest.getSelectionModel().getSelectedItem());
 			action.setGoal(goalComboBox.getSelectionModel().getSelectedItem());
+			actionAgentComboBox.getItems().add(action);
+			actionRepo.saveAll(actionAgentComboBox.getItems());
 			clearSelectionAction();
 		});
 
@@ -192,6 +198,8 @@ public class MainController {
 						Double.parseDouble(agreeableness.getText()), Double.parseDouble(neuroticism.getText()));
 				ocean.setAgent(agent);
 				OCEANRepo.save(ocean);
+				agentSrc.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
+				agentDest.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 				clearSelectionAgent();
 			} else {
 				Alert alert = new Alert(Alert.AlertType.INFORMATION);

@@ -14,3 +14,5 @@ https://o7planning.org/en/10621/install-javafx-scene-builder-into-eclipse#a27329
 
 configuring javafx with spring boot:
 https://wimdeblauwe.wordpress.com/2017/09/18/using-spring-boot-with-javafx/
+
+http://selab.fbk.eu/dnguyen/ejade/download.html

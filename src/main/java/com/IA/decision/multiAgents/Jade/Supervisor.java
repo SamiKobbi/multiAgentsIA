@@ -201,7 +201,7 @@ import javax.swing.JButton;
 							  // Agent controleur pour permettre la création des agents 
 							  AgentController Agent=null;
 							  //------
-							  Agent = container.createNewAgent("Diffuseur", "learning.Diffuseur", null);
+							  Agent = container.createNewAgent("Diffuseur", "com.IA.decision.multiAgents.Jade.Diffuseur", null);
 							  Agent.start();	
 							  jTextArea.append("<Diffuseur>  est lancé "+"\n");
 							  Agent = container.createNewAgent("Agent4", "learning.Agent1", null);
@@ -261,7 +261,7 @@ import javax.swing.JButton;
 						   cette commande est équivalente à la suivante: 
 						   java jade.Boot Portail:JADE_exemple_personnel.Portail
 						*/
-						Agent = container.createNewAgent("Supervisors", "learning.Supervisor", null);
+						Agent = container.createNewAgent("Supervisors", "com.IA.decision.multiAgents.Jade.Supervisor", null);
 					
 						// Démarrage de l'agent Portail
 						Agent.start();											
