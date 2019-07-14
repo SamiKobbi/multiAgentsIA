@@ -17,7 +17,9 @@ import com.IA.decision.multiAgents.Controllers.MainController;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
 
 import jade.core.ProfileImpl;
-
+import jade.core.Runtime;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
@@ -43,7 +45,6 @@ public class MultiAgentsApplication extends Application {
 	private ConfigurableApplicationContext context;
 	private Parent rootNode;
 
-
 	@Override
 	public void init() throws Exception {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder(MultiAgentsApplication.class);
@@ -56,7 +57,7 @@ public class MultiAgentsApplication extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-
+		
 		Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
 		double width = visualBounds.getWidth();
 		double height = visualBounds.getHeight();
@@ -71,8 +72,8 @@ public class MultiAgentsApplication extends Application {
 		context.close();
 	}
 
-	public static void main(String[] args) {
-	
+	public static void main(String[] args) throws StaleProxyException {
+
 		launch(args);
 	}
 	

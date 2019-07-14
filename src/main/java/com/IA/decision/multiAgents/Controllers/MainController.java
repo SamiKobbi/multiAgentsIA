@@ -11,11 +11,13 @@ import com.IA.decision.multiAgents.BO.Action;
 import com.IA.decision.multiAgents.BO.Agent;
 import com.IA.decision.multiAgents.BO.Event;
 import com.IA.decision.multiAgents.BO.Goal;
+import com.IA.decision.multiAgents.BO.GoalWeight;
 import com.IA.decision.multiAgents.BO.OCEAN;
 import com.IA.decision.multiAgents.repositories.ActionRepository;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
 import com.IA.decision.multiAgents.repositories.EventRepository;
 import com.IA.decision.multiAgents.repositories.GoalRepository;
+import com.IA.decision.multiAgents.repositories.GoalWeightRepository;
 import com.IA.decision.multiAgents.repositories.OCCRepository;
 import com.IA.decision.multiAgents.repositories.OCEANRepository;
 
@@ -113,6 +115,8 @@ public class MainController {
 	@Autowired
 	private EventRepository eventRepo;
 	@Autowired
+	private GoalWeightRepository goalWeightRepo;
+	@Autowired
 	private OCCRepository OCCRepo;
 	@Autowired
 	private ActionRepository actionRepo;
@@ -165,10 +169,12 @@ public class MainController {
 		});
 
 		saveGoal.setOnAction(event -> {
-
-			Goal goal = new Goal(goalName.getText(), Double.parseDouble(goalWeight.getText()));
+			
+			Goal goal = new Goal(goalName.getText());
+			GoalWeight goalWght = new GoalWeight(Double.parseDouble(goalWeight.getText()));
 			Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
-			goal.setAgent(agent);
+			goalWght.setAgent(agent);
+			goalWght.setGoal(goal);
 			goalComboBox.getItems().add(goal);
 			goalRepo.saveAll(goalComboBox.getItems());
 			clearSelectionGoal();
@@ -220,7 +226,7 @@ public class MainController {
 				extraversion.setText(oceanByAgent.getExtraversion().toString());
 				agreeableness.setText(oceanByAgent.getAgreeableness().toString());
 				neuroticism.setText(oceanByAgent.getNeuroticism().toString());
-				goalComboBox.setItems(FXCollections.observableArrayList(goalRepo.findByAgent(newAgent)));
+				//goalComboBox.setItems(FXCollections.observableArrayList(goalRepo.findByAgent(newAgent)));
 
 			}
 		});

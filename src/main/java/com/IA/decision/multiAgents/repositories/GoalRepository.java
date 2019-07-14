@@ -10,5 +10,5 @@ import com.IA.decision.multiAgents.BO.Goal;
 
 @Repository
 public interface GoalRepository extends JpaRepository<Goal, Long>  {
-	List<Goal> findByAgent(Agent agent);
+	//List<Goal> findByAgent(Agent agent);
 }

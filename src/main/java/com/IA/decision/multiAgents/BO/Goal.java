@@ -6,42 +6,29 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+
 @Entity
 public class Goal {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-
 	private String name;
-	private Double weight;
-	@ManyToOne
-	private Agent agent;
-	
-	public Goal()
-	{
-		
+
+	public Goal() {
+
 	}
-	public Goal(String goalName, double goalWeight) {
-	   this.name = goalName;
-	   this.weight = goalWeight;
+
+	public Goal(String goalName) {
+		this.name = goalName;
+
 	}
-	public void setAgent(Agent agent) {
-		this.agent = agent;
-	}
-	public Agent getAgent() {
-		return agent;
-	}
-	
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	public double getWeight() {
-		return weight;
-	}
-	public void setWeight(double weight) {
-		this.weight = weight;
-	}
+
 }

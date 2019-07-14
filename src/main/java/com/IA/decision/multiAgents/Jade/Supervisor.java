@@ -33,7 +33,15 @@ import java.io.IOException;
 
 import javax.swing.JTextArea;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Service;
 
+import com.IA.decision.multiAgents.MultiAgentsApplication;
+import com.IA.decision.multiAgents.repositories.AgentRepository;
+import com.IA.decision.multiAgents.services.impl.AgentServiceImpl;
 
 import javax.swing.JButton;
 
@@ -42,7 +50,7 @@ import javax.swing.JButton;
 	import java.awt.FlowLayout;
 	import javax.swing.JScrollPane;
 	import javax.swing.JLabel;
-
+	
 	public class Supervisor  extends Agent {
 		String ch; 
 				private JFrame jFrame = null;
@@ -54,6 +62,9 @@ import javax.swing.JButton;
 				private JButton jButton = null;
 				private JScrollPane jScrollPane=null;
 				private JLabel jLabel=null;
+				@Autowired
+				private AgentRepository agentRepo;
+				
 				
 				/** Cette méthode est appelé directement apèes la création de l'agent pour permettre
 				  * l'initialisation et l'affectation des différents comportements à cet agent 
@@ -193,6 +204,10 @@ import javax.swing.JButton;
 							public void actionPerformed(java.awt.event.ActionEvent e) {
 							try {
 								
+								System.out.println("sami");
+								 AnnotationConfigApplicationContext context = 
+								            new AnnotationConfigApplicationContext(MultiAgentsApplication.class);
+								
 							  // Récupération du conteneur (Main Container) en cours d'execution de Jade					
 							  Runtime rt = Runtime.instance();
 							  // Création du profil par défault
@@ -201,15 +216,16 @@ import javax.swing.JButton;
 							  // Agent controleur pour permettre la création des agents 
 							  AgentController Agent=null;
 							  //------
-							  Agent = container.createNewAgent("Diffuseur", "com.IA.decision.multiAgents.Jade.Diffuseur", null);
-							  Agent.start();	
-							  jTextArea.append("<Diffuseur>  est lancé "+"\n");
-							  Agent = container.createNewAgent("Agent4", "learning.Agent1", null);
-							  Agent.start();	
-							 jTextArea.append("Agent4 est lancé "+"\n");
-							  //------
-							  Agent = container.createNewAgent("Agent2", "learning.Agent2", null);
+							 	  Agent = container.createNewAgent("Diffuseur", "com.IA.decision.multiAgents.Jade.Diffuseur", null);
 							  Agent.start();
+						
+							  AgentRepository agentRepo = context.getBean(AgentRepository.class);
+							
+							for(com.IA.decision.multiAgents.BO.Agent agent :  agentRepo.findAll())
+							{
+							  Agent = container.createNewAgent(agent.getName(), "com.IA.decision.multiAgents.Jade.AgentTemplate", null);
+							  Agent.start();
+							}
 							  jTextArea.append("<Agent2> est lancé "+"\n");
 							  //------
 							  //Agent = container.createNewAgent("Agent3", "learning.Agent3", null);

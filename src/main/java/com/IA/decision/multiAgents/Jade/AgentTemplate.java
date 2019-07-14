@@ -33,7 +33,7 @@ public class AgentTemplate extends Agent {
 	int index = 0;
 
 	protected void setup() {
-		System.out.println(getLocalName() + " d�marr�");
+		System.out.println(getLocalName() + "started");
 		// ---------------
 		try {
 			// Cr�ation de desciprion de l'agent1
