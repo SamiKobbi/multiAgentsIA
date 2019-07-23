@@ -2,8 +2,15 @@ package com.IA.decision.multiAgents.Jade;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import com.IA.decision.multiAgents.MultiAgentsApplication;
+import com.IA.decision.multiAgents.repositories.AgentRepository;
+import com.IA.decision.multiAgents.repositories.EventRepository;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -15,107 +22,114 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 public class Diffuseur extends Agent {
-	String  ch;
-	int index ;
-		protected void setup()  {
-			System.out.println(getLocalName()+" d�marr�");
-			//---------------
-			try{
-			  // Cr�ation de desciprion de l'agent1
-			  DFAgentDescription dfd = new DFAgentDescription();
-			  dfd.setName(getAID());
-			  // Enregistrement de la description de l'agent1 dans DF (Directory Facilitator)
-			  DFService.register(this, dfd);
-			  System.out.println(getLocalName()+" enregistr� par le <DF>");
-			}catch (FIPAException e){
-				e.printStackTrace();	
-			}
-			addBehaviour(new DiffBehaviour());
-			addBehaviour(new DiffBehaviour2());
+	private  AgentRepository agentRepo;
+	private  EventRepository eventRepo;
+	private AnnotationConfigApplicationContext context;
+	 @Autowired
+	    private ApplicationContext appContext;
+	protected void setup() {
+		System.out.println(getLocalName() + " démarré");
+		// ---------------
+		try {
+			appContext.getApplicationName();
+			 context = new AnnotationConfigApplicationContext(
+					MultiAgentsApplication.class);
+			 agentRepo = context.getBean(AgentRepository.class);
+			 eventRepo = context.getBean(EventRepository.class);
+			 context.close();
+			DFAgentDescription dfd = new DFAgentDescription();
+			dfd.setName(getAID());
+			// Enregistrement de la description de l'agent1 dans DF (Directory Facilitator)
+			DFService.register(this, dfd);
+			System.out.println(getLocalName() + " enregistré par le <DF>");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		private class DiffBehaviour extends Behaviour{
-			private int i =0,o=0;
-			
-				public void action() {
-					
-					System.out.println("<Diffuseur Agent: searching for events from the network>");
-				
-					try {
-					
-						    //	System.out.println("<Diffuseur Agent: sending events to all the network>");
-				                ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
-				               msg3.setContent(ch);
-								
-								// Pr�ciser les agents destinataires du message qui est l'agent Vendeur dans ce cas
-								msg3.addReceiver(new AID("Agent1", AID.ISLOCALNAME));
-								msg3.addReceiver(new AID("Agent2", AID.ISLOCALNAME));
-								//msg3.addReceiver(new AID("Agent3", AID.ISLOCALNAME));
-								// Envoyer le message � l'agent Vendeur	
-								send(msg3); 
-								//o++;
-						    o++;
-						   }
-					catch (Exception e) {
-						System.err.println("Erreur lors de l'acc�s au fichier !");
-							e.printStackTrace();
-						}
-									
-						    	  
-						    	 
-						   
-						   }
-								                
-					@Override
-					public boolean done() {
-						// TODO Auto-generated method stub
-						
-						return  o==2;
-					}
-					}
-				
-				
-		private class DiffBehaviour2 extends Behaviour{
+		addBehaviour(new DiffBehaviour());
+		addBehaviour(new DiffBehaviour2());
+	}
 
-			@Override
-			public void action() {
-				// TODO Auto-generated method stub
-				ACLMessage msg2 = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-				if (msg2 != null) {	
-					System.out.println("Diffuseur received" +msg2.getContent()+ msg2.getSender());
-				
-			
-					index++;
-				}
-				}
+	private class DiffBehaviour extends Behaviour {
+		private int i = 0, o = 0;
 
-			@Override
-			public boolean done() {
-				// TODO Auto-generated method stub
+		public void action() {
+
+			System.out.println("<Diffuseur Agent: searching for events from the network>");
+		
+			try {
+				List<com.IA.decision.multiAgents.BO.Agent> listAgents = agentRepo.findAll();
+				// System.out.println("<Diffuseur Agent: sending events to all the network>");
+				for(com.IA.decision.multiAgents.BO.Agent agent:listAgents)
+				{
+					List<com.IA.decision.multiAgents.BO.Event> events = eventRepo.findByAgent(agent);
+					for(com.IA.decision.multiAgents.BO.Event event:events)
+					{
+						ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
+						msg3.setContent(event.getName());
+						msg3.addReceiver(new AID(agent.getName(), AID.ISLOCALNAME));
+			
+						// msg3.addReceiver(new AID("Agent3", AID.ISLOCALNAME));
+						// Envoyer le message � l'agent Vendeur
+						send(msg3);
+						o++;
+					}
+	
+				// o++;
 				
-				return index==2;
+				}
+				//msg3.setContent(content);
+
+				// Pr�ciser les agents destinataires du message qui est l'agent Vendeur dans ce
+				// cas
+				
+			} catch (Exception e) {
+				System.err.println("Erreur lors de l'accés au fichier !");
+				e.printStackTrace();
 			}
-			
-			
-			
+
 		}
-									
-					    	   
-					    
-		
+
+		@Override
+		public boolean done() {
+			// TODO Auto-generated method stub
+
+			return o==1;
+		}
+	}
+
+	private class DiffBehaviour2 extends Behaviour {
+		int index;
+		@Override
+		public void action() {
+			// TODO Auto-generated method stub
+			ACLMessage msg2 = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+			if (msg2 != null) {
+				System.out.println("Diffuseur received" + msg2.getContent() + msg2.getSender());
+
 				
-				protected void takeDown() {
-					
-					// Suppression de l'agent [Acheteur] depuis le DF
-					try {
-						DFService.deregister(this);
-						System.out.println(getLocalName()+" DEREGISTERED WITH THE DF");
-					} catch (FIPAException e) {
-						e.printStackTrace();
-					}
-				}	
-					
+				index++;
+			}
+		}
+
+		@Override
+		public boolean done() {
+//			// TODO Auto-generated method stub
+//
 		
-    	
+			return index == 2;
+		}
+
+	}
+
+	protected void takeDown() {
+
+		// Suppression de l'agent [Acheteur] depuis le DF
+		try {
+			DFService.deregister(this);
+			System.out.println(getLocalName() + " DEREGISTERED WITH THE DF");
+		} catch (FIPAException e) {
+			e.printStackTrace();
+		}
+	}
 
 }
-				

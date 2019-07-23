@@ -45,7 +45,7 @@
                         <TextField fx:id="goalName" layoutX="113.0" layoutY="98.0" />
                         <TextField fx:id="goalWeight" layoutX="113.0" layoutY="129.0" />
                         <Label layoutX="38.0" layoutY="58.0" prefHeight="21.0" prefWidth="51.0" text="Goals" />
-                        <ComboBox fx:id="goalComboBox" layoutX="113.0" layoutY="56.0" prefHeight="25.0" prefWidth="179.0" />
+                        <ComboBox fx:id="goalNameComboBox" layoutX="113.0" layoutY="56.0" prefHeight="25.0" prefWidth="179.0" />
                         <TabPane layoutX="38.0" layoutY="179.0" prefHeight="300.0" prefWidth="524.0" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
                             <Tab text="Event">

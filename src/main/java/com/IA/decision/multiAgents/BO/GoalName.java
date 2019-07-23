@@ -8,17 +8,25 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 @Entity
-public class Goal {
+public class GoalName {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	private String name;
 
-	public Goal() {
+	public GoalName() {
 
 	}
 
-	public Goal(String goalName) {
+	public GoalName(String goalName) {
 		this.name = goalName;
 
 	}

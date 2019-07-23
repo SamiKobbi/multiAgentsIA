@@ -37,10 +37,10 @@ public class Action {
 	public void setApprovalDegreeLevel(Double approvalDegreeLevel) {
 		this.approvalDegreeLevel = approvalDegreeLevel;
 	}
-	public Goal getGoal() {
+	public GoalName getGoal() {
 		return goal;
 	}
-	public void setGoal(Goal goal) {
+	public void setGoal(GoalName goal) {
 		this.goal = goal;
 	}
 	public Agent getAgentSrc() {
@@ -70,7 +70,7 @@ public class Action {
 	private Boolean requestOrResponse;
 	private Double approvalDegreeLevel;
 	@ManyToOne
-	private Goal goal;
+	private GoalName goal;
 	@OneToOne
 	private Agent agentSrc;
 	@OneToOne

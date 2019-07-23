@@ -9,13 +9,13 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 @Entity
-public class GoalWeight {
+public class GoalInfo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private Double weight;
 
-	public GoalWeight(Double weight) {
+	public GoalInfo(Double weight) {
 		super();
 		this.weight = weight;
 	}
@@ -28,20 +28,21 @@ public class GoalWeight {
 		this.agent = agent;
 	}
 
-	public Goal getGoal() {
-		return goal;
-	}
-
-	public void setGoal(Goal goal) {
-		this.goal = goal;
-	}
 
 	@OneToOne
 	private Agent agent;
 	@OneToOne
-	private Goal goal;
+	private GoalName goalName;
 
-	public GoalWeight() {
+	public GoalName getGoalName() {
+		return goalName;
+	}
+
+	public void setGoalName(GoalName goalName) {
+		this.goalName = goalName;
+	}
+
+	public GoalInfo() {
 
 	}
 }

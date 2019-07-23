@@ -44,13 +44,8 @@ public class Event {
 		this.eventIntensityLevel = eventIntensityLevel;
 	}
 
-	public Goal getGoal() {
-		return goal;
-	}
 
-	public void setGoal(Goal goal) {
-		this.goal = goal;
-	}
+
 
 	public Event(String name, Boolean confirmed, Boolean eventDegree, Double eventIntensityLevel) {
 		this.name = name;
@@ -65,7 +60,17 @@ public class Event {
 	private Double eventIntensityLevel;
 	
 	@ManyToOne
-	private Goal goal;
+	private GoalName goalName;
+
+	@ManyToOne
+	private Agent agent;
+	public GoalName getGoalName() {
+		return goalName;
+	}
+
+	public void setGoalName(GoalName goalName) {
+		this.goalName = goalName;
+	}
 
 	public Event()
 	{

@@ -10,14 +10,13 @@ import org.springframework.stereotype.Service;
 import com.IA.decision.multiAgents.BO.Action;
 import com.IA.decision.multiAgents.BO.Agent;
 import com.IA.decision.multiAgents.BO.Event;
-import com.IA.decision.multiAgents.BO.Goal;
-import com.IA.decision.multiAgents.BO.GoalWeight;
+import com.IA.decision.multiAgents.BO.GoalName;
+import com.IA.decision.multiAgents.BO.GoalInfo;
 import com.IA.decision.multiAgents.BO.OCEAN;
 import com.IA.decision.multiAgents.repositories.ActionRepository;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
 import com.IA.decision.multiAgents.repositories.EventRepository;
-import com.IA.decision.multiAgents.repositories.GoalRepository;
-import com.IA.decision.multiAgents.repositories.GoalWeightRepository;
+import com.IA.decision.multiAgents.repositories.GoalNameRepository;
 import com.IA.decision.multiAgents.repositories.OCCRepository;
 import com.IA.decision.multiAgents.repositories.OCEANRepository;
 
@@ -64,7 +63,7 @@ public class MainController {
 	@FXML
 	public Button saveGoal;
 	@FXML
-	public ComboBox<Goal> goalComboBox;
+	public ComboBox<GoalName> goalNameComboBox;
 	@FXML
 	public TextField goalName;
 	@FXML
@@ -115,7 +114,7 @@ public class MainController {
 	@Autowired
 	private EventRepository eventRepo;
 	@Autowired
-	private GoalWeightRepository goalWeightRepo;
+	private GoalNameRepository goalNameRepo;
 	@Autowired
 	private OCCRepository OCCRepo;
 	@Autowired
@@ -125,7 +124,7 @@ public class MainController {
 	@Autowired
 	private OCEANRepository OCEANRepo;
 	@Autowired
-	private GoalRepository goalRepo;
+	private GoalNameRepository goalRepo;
 
 	@FXML
 	public void initialize() {
@@ -133,14 +132,14 @@ public class MainController {
 		agentsComboBox.setConverter(new AgentNameStringConverter());
 		agentSrc.setConverter(new AgentNameStringConverter());
 		agentDest.setConverter(new AgentNameStringConverter());
-		goalComboBox.setConverter(new GoalNameStringConverter());
+		goalNameComboBox.setConverter(new GoalNameStringConverter());
 		eventComboBox.setConverter(new EventNameStringConverter());
 		actionAgentComboBox.setConverter(new ActionNameStringConverter());
 		agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentSrc.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentDest.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentsComboBox.getSelectionModel().selectFirst();
-		goalComboBox.getSelectionModel().selectFirst();
+		goalNameComboBox.getSelectionModel().selectFirst();
 
 		goButton.setOnAction(event -> {
 
@@ -162,7 +161,7 @@ public class MainController {
 			Action action = new Action(actionMessage.getText(), actionDeg.isSelected(), reqCheckbox.isSelected(), Double.parseDouble(actionApprDegLvl.getText()));
 			action.setAgentSrc(agentSrc.getSelectionModel().getSelectedItem());
 			action.setAgentDest(agentDest.getSelectionModel().getSelectedItem());
-			action.setGoal(goalComboBox.getSelectionModel().getSelectedItem());
+			action.setGoal(goalNameComboBox.getSelectionModel().getSelectedItem());
 			actionAgentComboBox.getItems().add(action);
 			actionRepo.saveAll(actionAgentComboBox.getItems());
 			clearSelectionAction();
@@ -170,22 +169,23 @@ public class MainController {
 
 		saveGoal.setOnAction(event -> {
 			
-			Goal goal = new Goal(goalName.getText());
-			GoalWeight goalWght = new GoalWeight(Double.parseDouble(goalWeight.getText()));
+			GoalName name = new GoalName(goalName.getText());
+			GoalInfo goalInfo = new GoalInfo(Double.parseDouble(goalWeight.getText()));
 			Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
-			goalWght.setAgent(agent);
-			goalWght.setGoal(goal);
-			goalComboBox.getItems().add(goal);
-			goalRepo.saveAll(goalComboBox.getItems());
+			goalInfo.setAgent(agent);
+			goalInfo.setGoalName(name);
+			goalNameComboBox.getItems().add(name);
+			goalRepo.saveAll(goalNameComboBox.getItems());
 			clearSelectionGoal();
 
 		});
-		// public Event(String name, Boolean confirmed, Boolean eventDegree, Double
-		// eventIntensityLevel)
+		
 		addEvent.setOnAction(event -> {
 			Event ev = new Event(eventName.getText(), confirmCheckBox.isSelected(), degreeCheckBox.isSelected(),
 					Double.parseDouble(eventIntensity.getText()));
-			ev.setGoal(goalComboBox.getSelectionModel().getSelectedItem());
+			
+			//ev.setGoalInfo(goalInfo);
+			//ev.setGoalInfo(goalNameComboBox.getSelectionModel().getSelectedItem());
 			eventComboBox.getItems().add(ev);
 			eventRepo.saveAll(eventComboBox.getItems());
 			clearSelectionEvent();
@@ -226,16 +226,17 @@ public class MainController {
 				extraversion.setText(oceanByAgent.getExtraversion().toString());
 				agreeableness.setText(oceanByAgent.getAgreeableness().toString());
 				neuroticism.setText(oceanByAgent.getNeuroticism().toString());
+				//List<GoalWeight> goalWeights = goalWeightRepo.findByAgent(agentsComboBox.getSelectionModel().getSelectedItem())
 				//goalComboBox.setItems(FXCollections.observableArrayList(goalRepo.findByAgent(newAgent)));
 
 			}
 		});
 		
-		goalComboBox.valueProperty().addListener((ChangeListener<Goal>) (ov, oldValue, newGoal) -> {
+		goalNameComboBox.valueProperty().addListener((ChangeListener<GoalName>) (ov, oldValue, newGoal) -> {
 
 			if (newGoal != null) {
 				
-				eventComboBox.setItems(FXCollections.observableArrayList(eventRepo.findByGoal(newGoal)));
+				eventComboBox.setItems(FXCollections.observableArrayList(eventRepo.findByGoalName(newGoal)));
 
 			}
 		});
@@ -271,7 +272,7 @@ public class MainController {
 	}
 
 	private void clearSelectionGoal() {
-		goalComboBox.getSelectionModel().clearSelection();
+		goalNameComboBox.getSelectionModel().clearSelection();
 		goalName.clear();
 		goalWeight.clear();
 	}
@@ -316,14 +317,14 @@ public class MainController {
 		}
 	}
 
-	private static class GoalNameStringConverter extends StringConverter<Goal> {
+	private static class GoalNameStringConverter extends StringConverter<GoalName> {
 		@Override
-		public String toString(Goal object) {
+		public String toString(GoalName object) {
 			return object.getName();
 		}
 
 		@Override
-		public Goal fromString(String string) {
+		public GoalName fromString(String string) {
 			return null;
 		}
 	}
