@@ -74,17 +74,20 @@ public class AgentTemplate extends Agent {
 			ACLMessage msg2 = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 			EventRepository eventRepo = ApplicationContextProvider.getApplicationContext().getBean(EventRepository.class);
 			AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext().getBean(AgentRepository.class);
-			GoalNameRepository goalNameRepo = ApplicationContextProvider.getApplicationContext().getBean(GoalNameRepository.class);
+			//GoalNameRepository goalNameRepo = ApplicationContextProvider.getApplicationContext().getBean(GoalNameRepository.class);
 			GoalInfoRepository goalInfoRepo = ApplicationContextProvider.getApplicationContext().getBean(GoalInfoRepository.class);
 			OCCRepository OCCRepo = ApplicationContextProvider.getApplicationContext().getBean(OCCRepository.class);
+			
 			if (msg2 != null) {
 				System.out.println("Agent1 received from " + msg2.getContent() + " Sender : " + msg2.getSender());
+				Long agentId = agentRepo.findAll().stream().filter(agent -> agent.getName().equals(getLocalName())).findAny().get().getId();
 				Optional<Event> event = eventRepo.findById(Long.parseLong(msg2.getContent()));
 				List<GoalInfo> goalInfos = goalInfoRepo.findByGoalName(event.get().getGoalName());
-				Optional<GoalInfo> goalInfo = goalInfos.stream().filter(goalInf -> goalInf.getAgent().getName().equals(getLocalName())).findAny();
+				Optional<GoalInfo> goalInfo = goalInfos.stream().filter(goalInf -> goalInf.getAgent().getId() == agentId).findAny();
 				Double impact = event.get().getEventIntensityLevel()*goalInfo.get().getWeight();
-				OCC occ = new OCC(); 
-				//occ.setAgent(agentRepo.f);
+				OCC occ = new OCC();
+				Optional<com.IA.decision.multiAgents.BO.Agent> agent = agentRepo.findById(agentId);
+				occ.setAgent(agent.get());
 				 if(event.get().getEventDegree())
 				 {
 					 occ.setJoy(impact);

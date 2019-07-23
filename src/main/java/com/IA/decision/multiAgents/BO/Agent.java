@@ -13,6 +13,10 @@ public class Agent {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	public Long getId() {
+		return id;
+	}
+
 	private String name;
 
 	public Agent(String name) {
