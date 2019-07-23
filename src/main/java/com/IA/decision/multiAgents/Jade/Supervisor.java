@@ -14,31 +14,41 @@ import jade.core.ProfileImpl;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
-
+import jade.util.leap.Properties;
 import jade.wrapper.*;
 
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import com.IA.decision.multiAgents.MultiAgentsApplication;
-import com.IA.decision.multiAgents.repositories.AgentRepository;
+import org.springframework.context.annotation.ComponentScan;
 
+import com.IA.decision.multiAgents.MultiAgentsApplication;
+import com.IA.decision.multiAgents.config.ApplicationContextProvider;
+import com.IA.decision.multiAgents.repositories.AgentRepository;
+@ComponentScan("com.IA.decision.multiAgents")
+@SpringBootApplication
 public class Supervisor extends Agent {
-	@Autowired
-	private AgentRepository agentRepo;
+
 	private static AnnotationConfigApplicationContext context;
 
 	protected void setup() {
-
+		  SpringApplicationBuilder springApplicationBuilder = new SpringApplicationBuilder(Supervisor.class)
+	                .sources(Supervisor.class)
+	                .properties(getProperties());
+		  springApplicationBuilder.run();
 		System.out.println("Agent " + getLocalName() + " est lancé ");
 		try {
 			Scanner s = new Scanner(System.in);
 			DFAgentDescription dfd = new DFAgentDescription();
 			dfd.setName(getAID());
 			DFService.register(this, dfd);
+
 			String action = s.next();
+
 			if(action.equals("go"))
 			{
 				goAgents();
@@ -50,7 +60,11 @@ public class Supervisor extends Agent {
 		// addBehaviour(new SupervisorBehaviour());
 		// addBehaviour(new SupervisorBehaviour2());
 	}
-
+	   static Properties getProperties() {
+		      Properties props = new Properties();
+		      props.put("spring.config.location", "classpath:jade/");
+		      return props;
+		   }
 	protected void takeDown() {
 		try {
 			// Suppression de l'agent [Portail] depuis le DF
@@ -66,9 +80,8 @@ public class Supervisor extends Agent {
 
 		try {
 
-			context = new AnnotationConfigApplicationContext(
-					MultiAgentsApplication.class);
-
+	
+		
 			// Récupération du conteneur (Main Container) en cours d'execution de Jade
 			Runtime rt = Runtime.instance();
 			// Création du profil par défault
@@ -87,11 +100,10 @@ public class Supervisor extends Agent {
 				
 			}
 		
-			AgentRepository agentRepo = context.getBean(AgentRepository.class);
+			AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext().getBean(AgentRepository.class);
 
 			for (com.IA.decision.multiAgents.BO.Agent agent : agentRepo.findAll()) {
-				if((container.getAgent(agent.getName()) == null))
-				{
+			
 					try {
 						container.getAgent(agent.getName());
 					}
@@ -102,7 +114,7 @@ public class Supervisor extends Agent {
 						Agent.start();
 					}
 			
-				}
+				
 			}
 
 			// Agent = container.createNewAgent("Agent3", "learning.Agent3", null);

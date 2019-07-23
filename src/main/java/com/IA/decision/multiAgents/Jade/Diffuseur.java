@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.IA.decision.multiAgents.MultiAgentsApplication;
+import com.IA.decision.multiAgents.config.ApplicationContextProvider;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
 import com.IA.decision.multiAgents.repositories.EventRepository;
 
@@ -22,21 +23,15 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 public class Diffuseur extends Agent {
-	private  AgentRepository agentRepo;
-	private  EventRepository eventRepo;
-	private AnnotationConfigApplicationContext context;
-	 @Autowired
-	    private ApplicationContext appContext;
+
+
 	protected void setup() {
+	
 		System.out.println(getLocalName() + " démarré");
 		// ---------------
 		try {
-			appContext.getApplicationName();
-			 context = new AnnotationConfigApplicationContext(
-					MultiAgentsApplication.class);
-			 agentRepo = context.getBean(AgentRepository.class);
-			 eventRepo = context.getBean(EventRepository.class);
-			 context.close();
+		
+
 			DFAgentDescription dfd = new DFAgentDescription();
 			dfd.setName(getAID());
 			// Enregistrement de la description de l'agent1 dans DF (Directory Facilitator)
@@ -53,7 +48,8 @@ public class Diffuseur extends Agent {
 		private int i = 0, o = 0;
 
 		public void action() {
-
+			 AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext().getBean(AgentRepository.class);
+			 EventRepository eventRepo = ApplicationContextProvider.getApplicationContext().getBean(EventRepository.class);
 			System.out.println("<Diffuseur Agent: searching for events from the network>");
 		
 			try {
@@ -65,7 +61,7 @@ public class Diffuseur extends Agent {
 					for(com.IA.decision.multiAgents.BO.Event event:events)
 					{
 						ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
-						msg3.setContent(event.getName());
+						msg3.setContent(event.getId().toString());
 						msg3.addReceiver(new AID(agent.getName(), AID.ISLOCALNAME));
 			
 						// msg3.addReceiver(new AID("Agent3", AID.ISLOCALNAME));

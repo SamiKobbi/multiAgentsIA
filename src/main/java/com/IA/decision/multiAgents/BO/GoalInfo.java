@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -14,6 +14,14 @@ public class GoalInfo {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private Double weight;
+
+	public Double getWeight() {
+		return weight;
+	}
+
+	public void setWeight(Double weight) {
+		this.weight = weight;
+	}
 
 	public GoalInfo(Double weight) {
 		super();
@@ -31,7 +39,7 @@ public class GoalInfo {
 
 	@OneToOne
 	private Agent agent;
-	@OneToOne
+	@ManyToOne
 	private GoalName goalName;
 
 	public GoalName getGoalName() {

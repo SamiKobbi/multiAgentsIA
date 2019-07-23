@@ -4,7 +4,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.IA.decision.multiAgents.BO.Event;
+import com.IA.decision.multiAgents.BO.GoalInfo;
+import com.IA.decision.multiAgents.BO.OCC;
+import com.IA.decision.multiAgents.config.ApplicationContextProvider;
+import com.IA.decision.multiAgents.repositories.AgentRepository;
+import com.IA.decision.multiAgents.repositories.EventRepository;
+import com.IA.decision.multiAgents.repositories.GoalInfoRepository;
+import com.IA.decision.multiAgents.repositories.GoalNameRepository;
+import com.IA.decision.multiAgents.repositories.OCCRepository;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -52,27 +67,33 @@ public class AgentTemplate extends Agent {
 
 	private class AgentBehaviour3 extends Behaviour {
 		private int k = 0, i = 1, p = 0;
-		double ED;
-		double GoalImp;
-		String ch3;
-		double EIL;
-		double Des;
-		double imp;
-		double imptemp;
-		double WGoal;
-		double Emotion;
-		String em;
-		String Ev = "EVENT";
-		String Ac = "REACTION";
 
 		double Weight = 0.00;
 
 		public void action() {
 			ACLMessage msg2 = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+			EventRepository eventRepo = ApplicationContextProvider.getApplicationContext().getBean(EventRepository.class);
+			AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext().getBean(AgentRepository.class);
+			GoalNameRepository goalNameRepo = ApplicationContextProvider.getApplicationContext().getBean(GoalNameRepository.class);
+			GoalInfoRepository goalInfoRepo = ApplicationContextProvider.getApplicationContext().getBean(GoalInfoRepository.class);
+			OCCRepository OCCRepo = ApplicationContextProvider.getApplicationContext().getBean(OCCRepository.class);
 			if (msg2 != null) {
-				System.out.println("Agent1 received from" + msg2.getContent() + msg2.getSender());
-				ch3 = msg2.getContent();
-
+				System.out.println("Agent1 received from " + msg2.getContent() + " Sender : " + msg2.getSender());
+				Optional<Event> event = eventRepo.findById(Long.parseLong(msg2.getContent()));
+				List<GoalInfo> goalInfos = goalInfoRepo.findByGoalName(event.get().getGoalName());
+				Optional<GoalInfo> goalInfo = goalInfos.stream().filter(goalInf -> goalInf.getAgent().getName().equals(getLocalName())).findAny();
+				Double impact = event.get().getEventIntensityLevel()*goalInfo.get().getWeight();
+				OCC occ = new OCC(); 
+				//occ.setAgent(agentRepo.f);
+				 if(event.get().getEventDegree())
+				 {
+					 occ.setJoy(impact);
+				 }
+				 else
+				 {
+					 occ.setDistress(impact);
+				 }
+				 OCCRepo.save(occ);
 				try {
 //					       for (int x=1; x<10;x++)
 //					       {
