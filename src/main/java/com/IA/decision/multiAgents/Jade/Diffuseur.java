@@ -10,6 +10,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import com.IA.decision.multiAgents.MultiAgentsApplication;
 import com.IA.decision.multiAgents.config.ApplicationContextProvider;
+import com.IA.decision.multiAgents.repositories.ActionRepository;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
 import com.IA.decision.multiAgents.repositories.EventRepository;
 
@@ -50,7 +51,9 @@ public class Diffuseur extends Agent {
 		public void action() {
 			 AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext().getBean(AgentRepository.class);
 			 EventRepository eventRepo = ApplicationContextProvider.getApplicationContext().getBean(EventRepository.class);
-			System.out.println("<Diffuseur Agent: searching for events from the network>");
+			 ActionRepository actionRepo = ApplicationContextProvider.getApplicationContext().getBean(ActionRepository.class);
+				
+			 System.out.println("<Diffuseur Agent: searching for events from the network>");
 		
 			try {
 				List<com.IA.decision.multiAgents.BO.Agent> listAgents = agentRepo.findAll();
@@ -61,9 +64,22 @@ public class Diffuseur extends Agent {
 					for(com.IA.decision.multiAgents.BO.Event event:events)
 					{
 						ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
-						msg3.setContent(event.getId().toString());
+						msg3.setContent("event:"+event.getId().toString());
 						msg3.addReceiver(new AID(agent.getName(), AID.ISLOCALNAME));
 			
+						// msg3.addReceiver(new AID("Agent3", AID.ISLOCALNAME));
+						// Envoyer le message � l'agent Vendeur
+						send(msg3);
+						o++;
+					}
+					List<com.IA.decision.multiAgents.BO.Action> actions = actionRepo.findByAgentDest(agent);
+					for(com.IA.decision.multiAgents.BO.Action action : actions)
+					{
+						ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
+						msg3.setContent("action:" + action.getId().toString());
+						msg3.addReceiver(new AID(agent.getName(), AID.ISLOCALNAME));
+						msg3.setSender(new AID(action.getAgentSrc().getName(), AID.ISLOCALNAME));
+						
 						// msg3.addReceiver(new AID("Agent3", AID.ISLOCALNAME));
 						// Envoyer le message � l'agent Vendeur
 						send(msg3);
@@ -87,23 +103,25 @@ public class Diffuseur extends Agent {
 
 		@Override
 		public boolean done() {
-			// TODO Auto-generated method stub
-
-			return o==1;
+			return o==3;
 		}
+
 	}
 
 	private class DiffBehaviour2 extends Behaviour {
 		int index;
 		@Override
 		public void action() {
+			
 			// TODO Auto-generated method stub
 			ACLMessage msg2 = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 			if (msg2 != null) {
+				
+				index++;
 				System.out.println("Diffuseur received" + msg2.getContent() + msg2.getSender());
 
 				
-				index++;
+			
 			}
 		}
 
@@ -112,7 +130,7 @@ public class Diffuseur extends Agent {
 //			// TODO Auto-generated method stub
 //
 		
-			return index == 2;
+			return index==2;
 		}
 
 	}
