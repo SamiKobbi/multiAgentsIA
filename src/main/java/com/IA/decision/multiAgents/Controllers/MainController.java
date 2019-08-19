@@ -4,18 +4,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.jms.JMSException;
+import javax.jms.Session;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Service;
 
 import com.IA.decision.multiAgents.BO.Action;
 import com.IA.decision.multiAgents.BO.Agent;
 import com.IA.decision.multiAgents.BO.Event;
+import com.IA.decision.multiAgents.BO.EventReaction;
 import com.IA.decision.multiAgents.BO.GoalName;
 import com.IA.decision.multiAgents.BO.GoalInfo;
 import com.IA.decision.multiAgents.BO.OCEAN;
+import com.IA.decision.multiAgents.Jade.Supervisor;
+import com.IA.decision.multiAgents.config.ApplicationContextProvider;
 import com.IA.decision.multiAgents.repositories.ActionRepository;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
+import com.IA.decision.multiAgents.repositories.EventReactionRepository;
 import com.IA.decision.multiAgents.repositories.EventRepository;
+import com.IA.decision.multiAgents.repositories.GoalInfoRepository;
 import com.IA.decision.multiAgents.repositories.GoalNameRepository;
 import com.IA.decision.multiAgents.repositories.OCCRepository;
 import com.IA.decision.multiAgents.repositories.OCEANRepository;
@@ -37,7 +47,7 @@ import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
 @Service
-public class MainController {
+public class MainController{
 	// agent
 	@FXML
 	public Button goButton;
@@ -114,7 +124,11 @@ public class MainController {
 	@Autowired
 	private EventRepository eventRepo;
 	@Autowired
+	private EventReactionRepository eventReactionRepo;
+	@Autowired
 	private GoalNameRepository goalNameRepo;
+	@Autowired
+	private GoalInfoRepository goalInfoRepo;
 	@Autowired
 	private OCCRepository OCCRepo;
 	@Autowired
@@ -123,9 +137,7 @@ public class MainController {
 	private AgentRepository agentRepo;
 	@Autowired
 	private OCEANRepository OCEANRepo;
-	@Autowired
-	private GoalNameRepository goalRepo;
-
+	@Autowired private JmsTemplate jmsTemplate;
 	@FXML
 	public void initialize() {
 
@@ -142,7 +154,7 @@ public class MainController {
 		goalNameComboBox.getSelectionModel().selectFirst();
 
 		goButton.setOnAction(event -> {
-
+					goAgents();
 //	    				Agent agent = new Agent("sami");
 //	    				
 //	    				Goal goal = new Goal("succeed the exam", 0.5);
@@ -175,7 +187,8 @@ public class MainController {
 			goalInfo.setAgent(agent);
 			goalInfo.setGoalName(name);
 			goalNameComboBox.getItems().add(name);
-			goalRepo.saveAll(goalNameComboBox.getItems());
+			goalNameRepo.saveAll(goalNameComboBox.getItems());
+			goalInfoRepo.save(goalInfo);
 			clearSelectionGoal();
 
 		});
@@ -183,11 +196,17 @@ public class MainController {
 		addEvent.setOnAction(event -> {
 			Event ev = new Event(eventName.getText(), confirmCheckBox.isSelected(), degreeCheckBox.isSelected(),
 					Double.parseDouble(eventIntensity.getText()));
+			EventReaction evReaction = new EventReaction(eventReaction.getText());
+			Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
+			ev.setAgent(agent);
+			ev.setGoalName(goalNameComboBox.getSelectionModel().getSelectedItem());
+			evReaction.setEvent(ev);
 			
 			//ev.setGoalInfo(goalInfo);
 			//ev.setGoalInfo(goalNameComboBox.getSelectionModel().getSelectedItem());
 			eventComboBox.getItems().add(ev);
 			eventRepo.saveAll(eventComboBox.getItems());
+			eventReactionRepo.save(evReaction);
 			clearSelectionEvent();
 		}
 
@@ -236,6 +255,10 @@ public class MainController {
 
 			if (newGoal != null) {
 				
+				goalName.setText(newGoal.getName());
+				Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
+				GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(agent.getId(), newGoal.getId());
+				goalWeight.setText(goalInfo.getWeight().toString());
 				eventComboBox.setItems(FXCollections.observableArrayList(eventRepo.findByGoalName(newGoal)));
 
 			}
@@ -246,6 +269,7 @@ public class MainController {
 	private void clearSelectionEvent() {
 		eventName.clear();
 		eventIntensity.clear();
+		eventReaction.clear();
 		eventComboBox.getSelectionModel().clearSelection();
 	}
 	private void clearSelectionAction() {
@@ -326,6 +350,38 @@ public class MainController {
 		@Override
 		public GoalName fromString(String string) {
 			return null;
+		}
+	}
+	private  void goAgents() {
+
+		try {
+		
+			AgentController Agent = null;
+			try {
+				Supervisor.getContainer().getAgent("Diffuseur");
+			} catch (jade.wrapper.ControllerException ex) {
+				Agent = Supervisor.getContainer().createNewAgent("Diffuseur", "com.IA.decision.multiAgents.Jade.Diffuseur", null);
+				Agent.start();
+
+			}
+
+			AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext()
+					.getBean(AgentRepository.class);
+
+			for (com.IA.decision.multiAgents.BO.Agent agent : agentRepo.findAll()) {
+
+				try {
+					Supervisor.getContainer().getAgent(agent.getName());
+				} catch (jade.wrapper.ControllerException ex) {
+					Agent = Supervisor.getContainer().createNewAgent(agent.getName(), "com.IA.decision.multiAgents.Jade.AgentTemplate",
+							null);
+					Agent.start();
+				}
+
+			}
+
+		} catch (Exception any) {
+			any.printStackTrace();
 		}
 	}
 }

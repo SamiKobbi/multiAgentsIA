@@ -23,6 +23,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsTemplate;
 
 import com.IA.decision.multiAgents.MultiAgentsApplication;
 import com.IA.decision.multiAgents.config.ApplicationContextProvider;
@@ -31,9 +33,12 @@ import com.IA.decision.multiAgents.repositories.AgentRepository;
 @ComponentScan("com.IA.decision.multiAgents")
 @SpringBootApplication
 public class Supervisor extends Agent {
+	private	static AgentContainer container ;
+	public static AgentContainer getContainer() {
+		return container;
+	}
 
 	private static AnnotationConfigApplicationContext context;
-
 	protected void setup() {
 		SpringApplicationBuilder springApplicationBuilder = new SpringApplicationBuilder(Supervisor.class)
 				.sources(Supervisor.class).properties(getProperties());
@@ -45,11 +50,10 @@ public class Supervisor extends Agent {
 			dfd.setName(getAID());
 			DFService.register(this, dfd);
 
-			String action = s.next();
-
-			if (action.equals("go")) {
-				goAgents();
-			}
+			Runtime rt = Runtime.instance();
+			ProfileImpl p = new ProfileImpl(false);
+			
+			container = rt.createAgentContainer(p);
 		} catch (FIPAException e) {
 			e.printStackTrace();
 		}
@@ -74,42 +78,14 @@ public class Supervisor extends Agent {
 			e.printStackTrace();
 		}
 	}
-
-	private static void goAgents() {
-
-		try {
-
-			Runtime rt = Runtime.instance();
-			ProfileImpl p = new ProfileImpl(false);
-			AgentContainer container = rt.createAgentContainer(p);
-			AgentController Agent = null;
-			try {
-				container.getAgent("Diffuseur");
-			} catch (jade.wrapper.ControllerException ex) {
-				Agent = container.createNewAgent("Diffuseur", "com.IA.decision.multiAgents.Jade.Diffuseur", null);
-				Agent.start();
-
-			}
-
-			AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext()
-					.getBean(AgentRepository.class);
-
-			for (com.IA.decision.multiAgents.BO.Agent agent : agentRepo.findAll()) {
-
-				try {
-					container.getAgent(agent.getName());
-				} catch (jade.wrapper.ControllerException ex) {
-					Agent = container.createNewAgent(agent.getName(), "com.IA.decision.multiAgents.Jade.AgentTemplate",
-							null);
-					Agent.start();
-				}
-
-			}
-
-		} catch (Exception any) {
-			any.printStackTrace();
+	@JmsListener(destination = "inbound.queue")
+	  public void receiveMessage(String message) {
+		if(message.equals("goAgent"))
+		{
+		//	goAgents();
 		}
-	}
+	  }
+
 
 	public static void main(String[] args) throws IOException {
 		try {

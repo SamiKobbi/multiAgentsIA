@@ -72,6 +72,14 @@ public class Event {
 
 	@ManyToOne
 	private Agent agent;
+	public Agent getAgent() {
+		return agent;
+	}
+
+	public void setAgent(Agent agent) {
+		this.agent = agent;
+	}
+
 	public GoalName getGoalName() {
 		return goalName;
 	}

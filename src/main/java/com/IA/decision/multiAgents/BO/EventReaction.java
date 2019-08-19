@@ -12,6 +12,10 @@ public class EventReaction {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 	
+	public EventReaction(String eventReaction) {
+		this.eventReaction = eventReaction;
+	}
+
 	public String getEventReaction() {
 		return eventReaction;
 	}

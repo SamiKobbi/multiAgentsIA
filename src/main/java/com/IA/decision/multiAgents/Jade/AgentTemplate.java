@@ -86,25 +86,37 @@ public class AgentTemplate extends Agent {
 			if (msg2 != null ) {
 				String message = msg2.getContent();
 				String msgType = (message.split(":"))[0];
+				Long agentId = agentRepo.findAll().stream().filter(agent -> agent.getName().equals(getLocalName()))
+						.findAny().get().getId();
+				Optional<com.IA.decision.multiAgents.BO.Agent> agent = agentRepo.findById(agentId);
 				if(msgType.equals("event"))
 				{
 				System.out.println("AgentTemplate received from " + msg2.getContent() + " Sender : " + msg2.getSender());
-				Long agentId = agentRepo.findAll().stream().filter(agent -> agent.getName().equals(getLocalName()))
-						.findAny().get().getId();
+		
 				Optional<Event> event = eventRepo.findById(Long.parseLong((message.split(":"))[1]));
 				List<GoalInfo> goalInfos = goalInfoRepo.findByGoalName(event.get().getGoalName());
 				Optional<GoalInfo> goalInfo = goalInfos.stream()
 						.filter(goalInf -> goalInf.getAgent().getId() == agentId).findAny();
 				Double impact = event.get().getEventIntensityLevel() * goalInfo.get().getWeight();
-				OCC occ = new OCC();
-				Optional<com.IA.decision.multiAgents.BO.Agent> agent = agentRepo.findById(agentId);
+				Optional<OCC> optocc = OCCRepo.findById(agent.get().getId());
+				OCC occ;
+				if(optocc.isPresent())
+				{
+					occ = optocc.get();
+				}
+				else
+				{
+					occ = new OCC();
+				}
 				occ.setAgent(agent.get());
+				occ.setAgentId(agent.get().getId());
 				if (event.get().getEventDegree()) {
 					occ.setJoy(impact);
 				} else {
 					occ.setDistress(impact);
 				}
 				OCCRepo.save(occ);
+			
 				
 
 
@@ -112,8 +124,40 @@ public class AgentTemplate extends Agent {
 				}
 				else if (msgType.equals("action"))
 				{
+			
+					Optional<OCC> optocc = OCCRepo.findById(agent.get().getId());
+					OCC occ;
+					if(optocc.isPresent())
+					{
+						occ = optocc.get();
+					}
+					else
+					{
+						occ = new OCC();
+					}
+					//praise worthy
+					//blame worthy
+					//it is a variable storing the value returned from the formula updating the occ vector
+					//praise worthy = action approval level * degree 
+					//proud should be equal to that value
 					Optional<Action> action = actionRepo.findById(Long.parseLong((message.split(":"))[1]));
-					action.get();
+					double praiseWorthy ;
+					double blameWorthy ;
+					if(action.get().getActionDegree())
+					{
+						 praiseWorthy = action.get().getApprovalDegreeLevel();
+					 	 occ.setProud(praiseWorthy);
+					}
+					else
+					{
+						blameWorthy = action.get().getApprovalDegreeLevel();
+						occ.setShame(blameWorthy);
+					}
+					
+					occ.setAgent(agent.get());
+					occ.setAgentId(agent.get().getId());
+				
+					OCCRepo.save(occ);
 					p++;
 				}
 			}

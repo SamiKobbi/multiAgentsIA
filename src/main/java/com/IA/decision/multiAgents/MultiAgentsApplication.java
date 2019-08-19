@@ -1,9 +1,19 @@
 package com.IA.decision.multiAgents;
 
+import javax.jms.ConnectionFactory;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.jms.annotation.EnableJms;
+import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import org.springframework.jms.config.JmsListenerContainerFactory;
+import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
+import org.springframework.jms.support.converter.MessageConverter;
+import org.springframework.jms.support.converter.MessageType;
+import org.springframework.util.ErrorHandler;
 
 import jade.wrapper.StaleProxyException;
 import javafx.application.Application;
@@ -14,6 +24,7 @@ import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+@EnableJms
 @SpringBootApplication
 public class MultiAgentsApplication extends Application {
 
@@ -32,7 +43,7 @@ public class MultiAgentsApplication extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		
+
 		Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
 		double width = visualBounds.getWidth();
 		double height = visualBounds.getHeight();
@@ -47,9 +58,11 @@ public class MultiAgentsApplication extends Application {
 		context.close();
 	}
 
+
+
 	public static void main(String[] args) throws StaleProxyException {
 
 		launch(args);
 	}
-	
+
 }

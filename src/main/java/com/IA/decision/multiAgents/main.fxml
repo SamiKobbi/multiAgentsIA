@@ -60,7 +60,7 @@
                                           <TextField fx:id="eventIntensity" layoutX="128.0" layoutY="73.0" prefHeight="25.0" prefWidth="241.0" />
                                           <TextField fx:id="eventReaction" layoutX="126.0" layoutY="126.0" prefHeight="25.0" prefWidth="245.0" />
                                           <Label layoutX="31.0" layoutY="130.0" prefHeight="17.0" prefWidth="86.0" text="Event reaction" />
-                                          <ComboBox fx:id="eventComboBox" layoutX="127.0" layoutY="14.0" prefHeight="25.0" prefWidth="233.0" promptText="Choose event" />
+                                          <ComboBox fx:id="eventComboBox" layoutX="128.0" layoutY="6.0" prefHeight="31.0" prefWidth="233.0" promptText="Choose event" />
                                           <Label layoutX="34.0" layoutY="18.0" text="Events" />
                                           <Button fx:id="addEvent" layoutX="392.0" layoutY="174.0" mnemonicParsing="false" text="Add Event" />
                                        </children>
