@@ -251,6 +251,19 @@ public class MainController{
 			}
 		});
 		
+		eventComboBox.valueProperty().addListener((ChangeListener<Event>) (ov, oldValue, newEvent) -> {
+			if (newEvent != null) {
+				Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
+				GoalName goalName = goalNameComboBox.getSelectionModel().getSelectedItem();
+				Event event = eventRepo.findByGoalNameAndAgent(agent.getId(), goalName.getId());
+				eventName.setText(event.getName());
+				eventIntensity.setText(event.getEventIntensityLevel().toString());
+				confirmCheckBox.setSelected(event.getConfirmed());
+				degreeCheckBox.setSelected(event.getEventDegree());
+				eventReaction.setText(eventReactionRepo.findByEvent(event).getEventReaction());
+			}
+			
+		});
 		goalNameComboBox.valueProperty().addListener((ChangeListener<GoalName>) (ov, oldValue, newGoal) -> {
 
 			if (newGoal != null) {

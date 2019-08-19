@@ -15,7 +15,10 @@ public class EventReaction {
 	public EventReaction(String eventReaction) {
 		this.eventReaction = eventReaction;
 	}
-
+	public EventReaction()
+	{
+		
+	}
 	public String getEventReaction() {
 		return eventReaction;
 	}
