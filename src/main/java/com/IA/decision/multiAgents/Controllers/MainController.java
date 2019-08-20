@@ -1,15 +1,13 @@
 package com.IA.decision.multiAgents.Controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import javax.jms.JMSException;
-import javax.jms.Session;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
+
 import org.springframework.stereotype.Service;
 
 import com.IA.decision.multiAgents.BO.Action;
@@ -30,15 +28,12 @@ import com.IA.decision.multiAgents.repositories.GoalNameRepository;
 import com.IA.decision.multiAgents.repositories.OCCRepository;
 import com.IA.decision.multiAgents.repositories.OCEANRepository;
 
-import jade.core.ProfileImpl;
-import jade.core.Runtime;
-import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.XYChart;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -137,7 +132,7 @@ public class MainController{
 	private AgentRepository agentRepo;
 	@Autowired
 	private OCEANRepository OCEANRepo;
-	@Autowired private JmsTemplate jmsTemplate;
+
 	@FXML
 	public void initialize() {
 
@@ -154,7 +149,19 @@ public class MainController{
 		goalNameComboBox.getSelectionModel().selectFirst();
 
 		goButton.setOnAction(event -> {
-					goAgents();
+			 
+		     
+			    FileWriter fileWriter;
+				try {
+					fileWriter = new FileWriter("C:\\multiAgents\\file.txt");
+					  fileWriter.write("go");
+					    fileWriter.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			  
+					//goAgents();
 //	    				Agent agent = new Agent("sami");
 //	    				
 //	    				Goal goal = new Goal("succeed the exam", 0.5);
@@ -365,36 +372,36 @@ public class MainController{
 			return null;
 		}
 	}
-	private  void goAgents() {
-
-		try {
-		
-			AgentController Agent = null;
-			try {
-				Supervisor.getContainer().getAgent("Diffuseur");
-			} catch (jade.wrapper.ControllerException ex) {
-				Agent = Supervisor.getContainer().createNewAgent("Diffuseur", "com.IA.decision.multiAgents.Jade.Diffuseur", null);
-				Agent.start();
-
-			}
-
-			AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext()
-					.getBean(AgentRepository.class);
-
-			for (com.IA.decision.multiAgents.BO.Agent agent : agentRepo.findAll()) {
-
-				try {
-					Supervisor.getContainer().getAgent(agent.getName());
-				} catch (jade.wrapper.ControllerException ex) {
-					Agent = Supervisor.getContainer().createNewAgent(agent.getName(), "com.IA.decision.multiAgents.Jade.AgentTemplate",
-							null);
-					Agent.start();
-				}
-
-			}
-
-		} catch (Exception any) {
-			any.printStackTrace();
-		}
-	}
+//	private  void goAgents() {
+//
+//		try {
+//		
+//			AgentController Agent = null;
+//			try {
+//				Supervisor.getContainer().getAgent("Diffuseur");
+//			} catch (jade.wrapper.ControllerException ex) {
+//				Agent = Supervisor.getContainer().createNewAgent("Diffuseur", "com.IA.decision.multiAgents.Jade.Diffuseur", null);
+//				Agent.start();
+//
+//			}
+//
+//			AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext()
+//					.getBean(AgentRepository.class);
+//
+//			for (com.IA.decision.multiAgents.BO.Agent agent : agentRepo.findAll()) {
+//
+//				try {
+//					Supervisor.getContainer().getAgent(agent.getName());
+//				} catch (jade.wrapper.ControllerException ex) {
+//					Agent = Supervisor.getContainer().createNewAgent(agent.getName(), "com.IA.decision.multiAgents.Jade.AgentTemplate",
+//							null);
+//					Agent.start();
+//				}
+//
+//			}
+//
+//		} catch (Exception any) {
+//			any.printStackTrace();
+//		}
+//	}
 }
