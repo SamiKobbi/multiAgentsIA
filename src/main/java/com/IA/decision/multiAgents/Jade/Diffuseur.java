@@ -9,10 +9,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.IA.decision.multiAgents.MultiAgentsApplication;
+import com.IA.decision.multiAgents.BO.EventName;
 import com.IA.decision.multiAgents.config.ApplicationContextProvider;
 import com.IA.decision.multiAgents.repositories.ActionRepository;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
-import com.IA.decision.multiAgents.repositories.EventRepository;
+import com.IA.decision.multiAgents.repositories.EventNameRepository;
+
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -50,49 +52,40 @@ public class Diffuseur extends Agent {
 
 		public void action() {
 			 AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext().getBean(AgentRepository.class);
-			 EventRepository eventRepo = ApplicationContextProvider.getApplicationContext().getBean(EventRepository.class);
+			 EventNameRepository eventNameRepo = ApplicationContextProvider.getApplicationContext().getBean(EventNameRepository.class);
 			 ActionRepository actionRepo = ApplicationContextProvider.getApplicationContext().getBean(ActionRepository.class);
 				
 			 System.out.println("<Diffuseur Agent: searching for events from the network>");
 		
 			try {
-				List<com.IA.decision.multiAgents.BO.Agent> listAgents = agentRepo.findAll();
-				// System.out.println("<Diffuseur Agent: sending events to all the network>");
-				for(com.IA.decision.multiAgents.BO.Agent agent:listAgents)
-				{
-					List<com.IA.decision.multiAgents.BO.Event> events = eventRepo.findByAgent(agent);
-					for(com.IA.decision.multiAgents.BO.Event event:events)
+			
+					List<EventName> events = eventNameRepo.findAll();
+					for(com.IA.decision.multiAgents.BO.EventName event:events)
 					{
 						ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
 						msg3.setContent("event:"+event.getId().toString());
-						msg3.addReceiver(new AID(agent.getName(), AID.ISLOCALNAME));
-			
-						// msg3.addReceiver(new AID("Agent3", AID.ISLOCALNAME));
-						// Envoyer le message � l'agent Vendeur
 						send(msg3);
 						o++;
 					}
-					List<com.IA.decision.multiAgents.BO.Action> actions = actionRepo.findByAgentDest(agent);
-					for(com.IA.decision.multiAgents.BO.Action action : actions)
-					{
-						ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
-						msg3.setContent("action:" + action.getId().toString());
-						msg3.addReceiver(new AID(agent.getName(), AID.ISLOCALNAME));
-						msg3.setSender(new AID(action.getAgentSrc().getName(), AID.ISLOCALNAME));
-						
-						// msg3.addReceiver(new AID("Agent3", AID.ISLOCALNAME));
-						// Envoyer le message � l'agent Vendeur
-						send(msg3);
-						o++;
-					}
+//					List<com.IA.decision.multiAgents.BO.Action> actions = actionRepo.findByAgentDest(agent);
+//					for(com.IA.decision.multiAgents.BO.Action action : actions)
+//					{
+//						ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
+//						msg3.setContent("action:" + action.getId().toString());
+//						msg3.addReceiver(new AID(agent.getName(), AID.ISLOCALNAME));
+//						msg3.setSender(new AID(action.getAgentSrc().getName(), AID.ISLOCALNAME));
+//						
+//						// msg3.addReceiver(new AID("Agent3", AID.ISLOCALNAME));
+//						// Envoyer le message � l'agent Vendeur
+//						send(msg3);
+//						o++;
+//					}
 	
 				// o++;
 				
-				}
+				
 				//msg3.setContent(content);
 
-				// Pr�ciser les agents destinataires du message qui est l'agent Vendeur dans ce
-				// cas
 				
 			} catch (Exception e) {
 				System.err.println("Erreur lors de l'accés au fichier !");

@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.IA.decision.multiAgents.BO.Action;
 import com.IA.decision.multiAgents.BO.Agent;
-import com.IA.decision.multiAgents.BO.Event;
+import com.IA.decision.multiAgents.BO.EventInfo;
+import com.IA.decision.multiAgents.BO.EventName;
 import com.IA.decision.multiAgents.BO.EventReaction;
 import com.IA.decision.multiAgents.BO.GoalName;
 import com.IA.decision.multiAgents.BO.GoalInfo;
@@ -21,8 +22,9 @@ import com.IA.decision.multiAgents.Jade.Supervisor;
 import com.IA.decision.multiAgents.config.ApplicationContextProvider;
 import com.IA.decision.multiAgents.repositories.ActionRepository;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
+import com.IA.decision.multiAgents.repositories.EventInfoRepository;
 import com.IA.decision.multiAgents.repositories.EventReactionRepository;
-import com.IA.decision.multiAgents.repositories.EventRepository;
+import com.IA.decision.multiAgents.repositories.EventNameRepository;
 import com.IA.decision.multiAgents.repositories.GoalInfoRepository;
 import com.IA.decision.multiAgents.repositories.GoalNameRepository;
 import com.IA.decision.multiAgents.repositories.OCCRepository;
@@ -85,7 +87,7 @@ public class MainController{
 	@FXML
 	public CheckBox degreeCheckBox;
 	@FXML
-	public ComboBox<Event> eventComboBox;
+	public ComboBox<EventName> eventNameComboBox;
 	@FXML
 	public TextField eventReaction;
 	@FXML
@@ -117,7 +119,9 @@ public class MainController{
 	LineChart emotionsChart;
 	// reports
 	@Autowired
-	private EventRepository eventRepo;
+	private EventNameRepository eventNameRepo;
+	@Autowired
+	private EventInfoRepository eventInfoRepo;
 	@Autowired
 	private EventReactionRepository eventReactionRepo;
 	@Autowired
@@ -140,7 +144,7 @@ public class MainController{
 		agentSrc.setConverter(new AgentNameStringConverter());
 		agentDest.setConverter(new AgentNameStringConverter());
 		goalNameComboBox.setConverter(new GoalNameStringConverter());
-		eventComboBox.setConverter(new EventNameStringConverter());
+		eventNameComboBox.setConverter(new EventNameStringConverter());
 		actionAgentComboBox.setConverter(new ActionNameStringConverter());
 		agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentSrc.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
@@ -167,7 +171,7 @@ public class MainController{
 //	    				Goal goal = new Goal("succeed the exam", 0.5);
 //	    				goal.setAgent(agent);
 //	    				
-//	    				Event ev = new Event("Exams will be difficult",false,false,0.3);
+//	    				EventName ev = new EventName("Exams will be difficult",false,false,0.3);
 //
 //	    				ev.setGoal(goal);
 //	    				
@@ -201,18 +205,22 @@ public class MainController{
 		});
 		
 		addEvent.setOnAction(event -> {
-			Event ev = new Event(eventName.getText(), confirmCheckBox.isSelected(), degreeCheckBox.isSelected(),
-					Double.parseDouble(eventIntensity.getText()));
+			EventName evName = new EventName(eventName.getText(), confirmCheckBox.isSelected());
+			evName.setGoalName(goalNameComboBox.getSelectionModel().getSelectedItem());
+			EventInfo evInfo = new EventInfo(degreeCheckBox.isSelected(), Double.parseDouble(eventIntensity.getText()) );
+			evInfo.setEventName(evName);
+			evInfo.setAgent(agentsComboBox.getSelectionModel().getSelectedItem());
 			EventReaction evReaction = new EventReaction(eventReaction.getText());
 			Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
-			ev.setAgent(agent);
-			ev.setGoalName(goalNameComboBox.getSelectionModel().getSelectedItem());
-			evReaction.setEvent(ev);
+
+			
+			
 			
 			//ev.setGoalInfo(goalInfo);
 			//ev.setGoalInfo(goalNameComboBox.getSelectionModel().getSelectedItem());
-			eventComboBox.getItems().add(ev);
-			eventRepo.saveAll(eventComboBox.getItems());
+			eventNameComboBox.getItems().add(evName);
+			eventNameRepo.saveAll(eventNameComboBox.getItems());
+			eventInfoRepo.save(evInfo);
 			eventReactionRepo.save(evReaction);
 			clearSelectionEvent();
 		}
@@ -258,16 +266,16 @@ public class MainController{
 			}
 		});
 		
-		eventComboBox.valueProperty().addListener((ChangeListener<Event>) (ov, oldValue, newEvent) -> {
+		eventNameComboBox.valueProperty().addListener((ChangeListener<EventName>) (ov, oldValue, newEvent) -> {
 			if (newEvent != null) {
 				Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
 				GoalName goalName = goalNameComboBox.getSelectionModel().getSelectedItem();
-				Event event = eventRepo.findByGoalNameAndAgent(agent.getId(), goalName.getId());
-				eventName.setText(event.getName());
-				eventIntensity.setText(event.getEventIntensityLevel().toString());
-				confirmCheckBox.setSelected(event.getConfirmed());
-				degreeCheckBox.setSelected(event.getEventDegree());
-				eventReaction.setText(eventReactionRepo.findByEvent(event).getEventReaction());
+				EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent(agent.getId(), newEvent.getId());
+				eventName.setText(newEvent.getName());
+				eventIntensity.setText(eventInfo.getEventIntensityLevel().toString());
+				confirmCheckBox.setSelected(newEvent.getConfirmed());
+				degreeCheckBox.setSelected(eventInfo.getEventDegree());
+				eventReaction.setText(eventReactionRepo.findByEventInfo(eventInfo).getReactionName());
 			}
 			
 		});
@@ -279,7 +287,7 @@ public class MainController{
 				Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
 				GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(agent.getId(), newGoal.getId());
 				goalWeight.setText(goalInfo.getWeight().toString());
-				eventComboBox.setItems(FXCollections.observableArrayList(eventRepo.findByGoalName(newGoal)));
+				eventNameComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findByGoalName(newGoal)));
 
 			}
 		});
@@ -290,7 +298,7 @@ public class MainController{
 		eventName.clear();
 		eventIntensity.clear();
 		eventReaction.clear();
-		eventComboBox.getSelectionModel().clearSelection();
+		eventNameComboBox.getSelectionModel().clearSelection();
 	}
 	private void clearSelectionAction() {
 		actionMessage.clear();
@@ -349,14 +357,14 @@ public class MainController{
 		}
 	}
 
-	private static class EventNameStringConverter extends StringConverter<Event> {
+	private static class EventNameStringConverter extends StringConverter<EventName> {
 		@Override
-		public String toString(Event object) {
+		public String toString(EventName object) {
 			return object.getName();
 		}
 
 		@Override
-		public Event fromString(String string) {
+		public EventName fromString(String string) {
 			return null;
 		}
 	}

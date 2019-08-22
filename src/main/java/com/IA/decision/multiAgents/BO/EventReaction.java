@@ -12,31 +12,38 @@ public class EventReaction {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 	
-	public EventReaction(String eventReaction) {
-		this.eventReaction = eventReaction;
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public EventReaction(String reactionName) {
+		this.reactionName = reactionName;
 	}
 	public EventReaction()
 	{
 		
 	}
-	public String getEventReaction() {
-		return eventReaction;
+	public String getReactionName() {
+		return reactionName;
 	}
 
-	public void setEventReaction(String eventReaction) {
-		this.eventReaction = eventReaction;
+	public void setEventReaction(String reactionName) {
+		this.reactionName = reactionName;
 	}
 
-	public Event getEvent() {
-		return event;
+
+	public EventName getEventName() {
+		return eventName;
+	}
+	public void setEventName(EventName eventName) {
+		this.eventName = eventName;
 	}
 
-	public void setEvent(Event event) {
-		this.event = event;
-	}
-
-	private String eventReaction;
+	private String reactionName;
 	
 	@OneToOne
-	private Event event;
+	private EventName eventName;
+
 }

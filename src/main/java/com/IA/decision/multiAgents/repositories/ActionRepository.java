@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.IA.decision.multiAgents.BO.Action;
 import com.IA.decision.multiAgents.BO.Agent;
-import com.IA.decision.multiAgents.BO.Event;
+import com.IA.decision.multiAgents.BO.EventName;
 
 
 
