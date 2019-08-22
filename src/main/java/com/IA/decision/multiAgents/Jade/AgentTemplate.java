@@ -44,17 +44,17 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import jade.util.leap.Iterator;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 public class AgentTemplate extends Agent {
-
-	private Object[] obj = null;
-	String Rea;
+	private static final Logger logger = LogManager.getLogger(AgentTemplate.class);
+	
 	String msg2;
 	String message;
 	int index = 0;
 
 	protected void setup() {
-		System.out.println(getLocalName() + "started");
+		logger.info(getLocalName() + " started");
 		// ---------------
 		try {
 
@@ -62,7 +62,7 @@ public class AgentTemplate extends Agent {
 			dfd.setName(getAID());
 			// Enregistrement de la description de l'agent1 dans DF (Directory Facilitator)
 			DFService.register(this, dfd);
-			System.out.println(getLocalName() + " enregistré par le <DF>");
+			logger.info(getLocalName() + " registred in the <DF>");
 		} catch (FIPAException e) {
 			e.printStackTrace();
 		}
@@ -72,8 +72,11 @@ public class AgentTemplate extends Agent {
 	}
 
 	private class AgentTemplateSendBehaviour extends Behaviour {
-		private int  p = 0;
-
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private int p = 0;
 
 		public void action() {
 			ACLMessage msg2 = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
@@ -91,46 +94,42 @@ public class AgentTemplate extends Agent {
 					.getBean(EventReactionRepository.class);
 			OCCRepository OCCRepo = ApplicationContextProvider.getApplicationContext().getBean(OCCRepository.class);
 
-			if (msg2 != null ) {
+			if (msg2 != null) {
 				String message = msg2.getContent();
 				String msgType = (message.split(":"))[0];
 				Long agentId = agentRepo.findAll().stream().filter(agent -> agent.getName().equals(getLocalName()))
 						.findAny().get().getId();
 				Optional<com.IA.decision.multiAgents.BO.Agent> agent = agentRepo.findById(agentId);
-				if(msgType.equals("event"))
-				{
-				System.out.println("AgentTemplate received from " + msg2.getContent() + " Sender : " + msg2.getSender());
-		
-				Optional<EventName> eventName = eventNameRepo.findById(Long.parseLong((message.split(":"))[1]));
-				GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(eventName.get().getGoalName().getId() , agentId);
-				EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent(eventName.get().getId(),agentId);
-				Double impact = eventInfo.getEventIntensityLevel() * goalInfo.getWeight();
-				Optional<OCC> optocc = OCCRepo.findById(agent.get().getId());
-				OCC occ;
-				if(optocc.isPresent())
-				{
-					occ = optocc.get();
-				}
-				else
-				{
-					occ = new OCC();
-				}
-				occ.setAgent(agent.get());
-				occ.setAgentId(agent.get().getId());
-				if (eventInfo.getEventDegree()) {
-					occ.setJoy(impact);
-				} else {
-					occ.setDistress(impact);
-				}
-				OCCRepo.save(occ);
-				EventReaction eventReaction = eventReactionRepo.findByEventInfo(eventInfo);
-				ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
-				msg3.setContent("eventReaction:"+eventReaction.getId());
-				send(msg3);
-		
+				if (msgType.equals("event")) {
+					logger.info(
+							"AgentTemplate received event message" + msg2.getContent() + " from Sender : " + msg2.getSender());
 
+					Optional<EventName> eventName = eventNameRepo.findById(Long.parseLong((message.split(":"))[1]));
+					GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(eventName.get().getGoalName().getId(),
+							agentId);
+					EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent(eventName.get().getId(), agentId);
+					Double impact = eventInfo.getEventIntensityLevel() * goalInfo.getWeight();
+					Optional<OCC> optocc = OCCRepo.findById(agent.get().getId());
+					OCC occ;
+					if (optocc.isPresent()) {
+						occ = optocc.get();
+					} else {
+						occ = new OCC();
+					}
+					occ.setAgent(agent.get());
+					occ.setAgentId(agent.get().getId());
+					if (eventInfo.getEventDegree()) {
+						occ.setJoy(impact);
+					} else {
+						occ.setDistress(impact);
+					}
+					OCCRepo.save(occ);
+					EventReaction eventReaction = eventReactionRepo.findByEventInfo(eventInfo);
+					ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
+					msg3.setContent("eventReaction:" + eventReaction.getId());
+					send(msg3);
 
-				p++;
+					p++;
 				}
 //				else if (msgType.equals("action"))
 //				{

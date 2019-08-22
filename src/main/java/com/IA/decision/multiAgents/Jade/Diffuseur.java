@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -26,11 +28,12 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 public class Diffuseur extends Agent {
-
+	
+	private static final Logger logger = LogManager.getLogger(Diffuseur.class);
 
 	protected void setup() {
 	
-		System.out.println(getLocalName() + " démarré");
+		logger.info(getLocalName() + " started");
 		// ---------------
 		try {
 		
@@ -39,7 +42,7 @@ public class Diffuseur extends Agent {
 			dfd.setName(getAID());
 			// Enregistrement de la description de l'agent1 dans DF (Directory Facilitator)
 			DFService.register(this, dfd);
-			System.out.println(getLocalName() + " enregistré par le <DF>");
+			logger.info(getLocalName() + " is registered in the <DF>");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -48,22 +51,31 @@ public class Diffuseur extends Agent {
 	}
 
 	private class DiffBehaviour extends Behaviour {
-		private int i = 0, o = 0;
-
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private int o = 0;
+		 AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext().getBean(AgentRepository.class);
+		 EventNameRepository eventNameRepo = ApplicationContextProvider.getApplicationContext().getBean(EventNameRepository.class);
+		 ActionRepository actionRepo = ApplicationContextProvider.getApplicationContext().getBean(ActionRepository.class);
+			
 		public void action() {
-			 AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext().getBean(AgentRepository.class);
-			 EventNameRepository eventNameRepo = ApplicationContextProvider.getApplicationContext().getBean(EventNameRepository.class);
-			 ActionRepository actionRepo = ApplicationContextProvider.getApplicationContext().getBean(ActionRepository.class);
-				
-			 System.out.println("<Diffuseur Agent: searching for events from the network>");
+		
+			 logger.info("<Diffuseur Agent: searching for events from the network>");
 		
 			try {
-			
+					List<com.IA.decision.multiAgents.BO.Agent> agents = agentRepo.findAll();
 					List<EventName> events = eventNameRepo.findAll();
 					for(com.IA.decision.multiAgents.BO.EventName event:events)
 					{
-						ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
+						logger.info("<Diffuseur Agent>: Diffusing message "+event.getName());
+						ACLMessage msg3= new ACLMessage(ACLMessage.INFORM) ;
 						msg3.setContent("event:"+event.getId().toString());
+						for(com.IA.decision.multiAgents.BO.Agent agent : agents)
+						{
+						msg3.addReceiver(new AID(agent.getName(), AID.ISLOCALNAME));
+						}
 						send(msg3);
 						o++;
 					}
@@ -88,7 +100,7 @@ public class Diffuseur extends Agent {
 
 				
 			} catch (Exception e) {
-				System.err.println("Erreur lors de l'accés au fichier !");
+				logger.error("Erreur lors de l'accés au fichier !");
 				e.printStackTrace();
 			}
 
@@ -96,7 +108,7 @@ public class Diffuseur extends Agent {
 
 		@Override
 		public boolean done() {
-			return o==3;
+			return o == eventNameRepo.findAll().size();
 		}
 
 	}
@@ -111,7 +123,7 @@ public class Diffuseur extends Agent {
 			if (msg2 != null) {
 				
 				index++;
-				System.out.println("Diffuseur received" + msg2.getContent() + msg2.getSender());
+				System.out.println("Diffuseur received " + msg2.getContent() + " from "+ msg2.getSender());
 
 				
 			

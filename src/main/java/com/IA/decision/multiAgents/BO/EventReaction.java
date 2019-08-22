@@ -34,16 +34,17 @@ public class EventReaction {
 	}
 
 
-	public EventName getEventName() {
-		return eventName;
-	}
-	public void setEventName(EventName eventName) {
-		this.eventName = eventName;
-	}
 
 	private String reactionName;
 	
 	@OneToOne
-	private EventName eventName;
+	private EventInfo eventInfo;
+
+	public EventInfo getEventInfo() {
+		return eventInfo;
+	}
+	public void setEventInfo(EventInfo eventInfo) {
+		this.eventInfo = eventInfo;
+	}
 
 }

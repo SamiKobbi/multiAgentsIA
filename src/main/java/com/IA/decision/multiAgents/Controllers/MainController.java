@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import com.IA.decision.multiAgents.BO.EventReaction;
 import com.IA.decision.multiAgents.BO.GoalName;
 import com.IA.decision.multiAgents.BO.GoalInfo;
 import com.IA.decision.multiAgents.BO.OCEAN;
+import com.IA.decision.multiAgents.Jade.Diffuseur;
 import com.IA.decision.multiAgents.Jade.Supervisor;
 import com.IA.decision.multiAgents.config.ApplicationContextProvider;
 import com.IA.decision.multiAgents.repositories.ActionRepository;
@@ -45,6 +48,7 @@ import javafx.util.StringConverter;
 
 @Service
 public class MainController{
+	private static final Logger logger = LogManager.getLogger(MainController.class);
 	// agent
 	@FXML
 	public Button goButton;
@@ -110,7 +114,7 @@ public class MainController{
 	@FXML
 	public CheckBox actionDeg;
 	@FXML
-	public ComboBox<Action> actionAgentComboBox;
+	public ComboBox<Action> actionComboBox;
 	@FXML
 	public Button addAction;
 	// Action
@@ -145,22 +149,26 @@ public class MainController{
 		agentDest.setConverter(new AgentNameStringConverter());
 		goalNameComboBox.setConverter(new GoalNameStringConverter());
 		eventNameComboBox.setConverter(new EventNameStringConverter());
-		actionAgentComboBox.setConverter(new ActionNameStringConverter());
+		actionComboBox.setConverter(new ActionNameStringConverter());
 		agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentSrc.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentDest.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentsComboBox.getSelectionModel().selectFirst();
+		goalNameComboBox.setItems(FXCollections.observableArrayList(goalNameRepo.findAll()));
+		eventNameComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findAll()));
+		actionComboBox.setItems(FXCollections.observableArrayList(actionRepo.findAll()));
 		goalNameComboBox.getSelectionModel().selectFirst();
 
 		goButton.setOnAction(event -> {
 			 
-		     
+			logger.info("go Agents");
 			    FileWriter fileWriter;
 				try {
 					fileWriter = new FileWriter("C:\\multiAgents\\file.txt");
 					  fileWriter.write("go");
 					    fileWriter.close();
 				} catch (IOException e) {
+					logger.error(e);
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -185,8 +193,8 @@ public class MainController{
 			action.setAgentSrc(agentSrc.getSelectionModel().getSelectedItem());
 			action.setAgentDest(agentDest.getSelectionModel().getSelectedItem());
 			action.setGoal(goalNameComboBox.getSelectionModel().getSelectedItem());
-			actionAgentComboBox.getItems().add(action);
-			actionRepo.saveAll(actionAgentComboBox.getItems());
+			actionComboBox.getItems().add(action);
+			actionRepo.saveAll(actionComboBox.getItems());
 			clearSelectionAction();
 		});
 
@@ -232,6 +240,7 @@ public class MainController{
 
 				Agent agent = agentRepo.save(new Agent(agentName.getText()));
 				agentsComboBox.getItems().add(agent);
+				
 				// goalComboBox.getItems().stream().forEach(goalCombo->{goalCombo.setAgent(agent);});
 				OCEAN ocean = new OCEAN(Double.parseDouble(openness.getText()),
 						Double.parseDouble(conscientiousness.getText()), Double.parseDouble(extraversion.getText()),
@@ -260,16 +269,15 @@ public class MainController{
 				extraversion.setText(oceanByAgent.getExtraversion().toString());
 				agreeableness.setText(oceanByAgent.getAgreeableness().toString());
 				neuroticism.setText(oceanByAgent.getNeuroticism().toString());
-				//List<GoalWeight> goalWeights = goalWeightRepo.findByAgent(agentsComboBox.getSelectionModel().getSelectedItem())
-				//goalComboBox.setItems(FXCollections.observableArrayList(goalRepo.findByAgent(newAgent)));
-
+				
+			
 			}
 		});
 		
 		eventNameComboBox.valueProperty().addListener((ChangeListener<EventName>) (ov, oldValue, newEvent) -> {
 			if (newEvent != null) {
 				Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
-				GoalName goalName = goalNameComboBox.getSelectionModel().getSelectedItem();
+				
 				EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent(agent.getId(), newEvent.getId());
 				eventName.setText(newEvent.getName());
 				eventIntensity.setText(eventInfo.getEventIntensityLevel().toString());
@@ -303,7 +311,7 @@ public class MainController{
 	private void clearSelectionAction() {
 		actionMessage.clear();
 		actionApprDegLvl.clear();
-		actionAgentComboBox.getSelectionModel().clearSelection();
+		actionComboBox.getSelectionModel().clearSelection();
 		agentSrc.getSelectionModel().clearSelection();
 		agentDest.getSelectionModel().clearSelection();
 	}

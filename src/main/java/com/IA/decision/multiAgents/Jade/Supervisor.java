@@ -26,6 +26,9 @@ import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.omg.PortableServer.POAManagerPackage.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -41,21 +44,22 @@ import com.IA.decision.multiAgents.repositories.AgentRepository;
 @ComponentScan("com.IA.decision.multiAgents")
 @SpringBootApplication
 public class Supervisor extends Agent {
-
+	private static final Logger logger = LogManager.getLogger(Supervisor.class);
 	private static AnnotationConfigApplicationContext context;
 	private static AgentContainer container ;
+	private static Runtime rt ;
 	protected void setup() {
 		SpringApplicationBuilder springApplicationBuilder = new SpringApplicationBuilder(Supervisor.class)
 				.sources(Supervisor.class).properties(getProperties());
 		springApplicationBuilder.run();
-		System.out.println("Agent " + getLocalName() + " est lancé ");
+		System.out.println("Agent " + getLocalName() + " is started ");
 		try {
 			Scanner s = new Scanner(System.in);
 			DFAgentDescription dfd = new DFAgentDescription();
 			dfd.setName(getAID());
 			DFService.register(this, dfd);
 
-			Runtime rt = Runtime.instance();
+			rt = Runtime.instance();
 			ProfileImpl p = new ProfileImpl(false);
 			Path currentRelativePath = Paths.get("");
 			container = rt.createAgentContainer(p);
@@ -66,8 +70,10 @@ public class Supervisor extends Agent {
 				    public void onFileChange(File file) {
 					  try {
 						List<String> content = Files.readAllLines(Paths.get(file.getPath()));
+						
 						if(content.size()>0 && content.get(0).equals("go"))
 						{
+							logger.info("go Agents");
 							goAgents();
 						}
 						PrintWriter writer = new PrintWriter(file);
@@ -96,9 +102,13 @@ public class Supervisor extends Agent {
 		// addBehaviour(new SupervisorBehaviour2());
 	}
 	private  void goAgents() {
-
-		try {
 		
+		try {
+			ProfileImpl p = new ProfileImpl(false);
+
+			container.kill();
+			container = rt.createAgentContainer(p);
+			
 			AgentController Agent = null;
 			try {
 				container.getAgent("Diffuseur");
@@ -124,6 +134,7 @@ public class Supervisor extends Agent {
 			}
 
 		} catch (Exception any) {
+			logger.error(any);
 			any.printStackTrace();
 		}
 	}
