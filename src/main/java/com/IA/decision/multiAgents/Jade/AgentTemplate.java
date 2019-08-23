@@ -67,33 +67,59 @@ public class AgentTemplate extends Agent {
 			e.printStackTrace();
 		}
 		addBehaviour(new AgentTemplateSendBehaviour());
-		// addBehaviour(new AgentBehaviour());
+		addBehaviour(new AgentTemplateReceiveBehaviour());
 		// addBehaviour(new AgentBehaviour2());
 	}
+	private class AgentTemplateReceiveBehaviour extends Behaviour {
+		/**
+		 * 
+		 */
+		private  final	EventReactionRepository eventReactionRepo = ApplicationContextProvider.getApplicationContext()
+				.getBean(EventReactionRepository.class);
+		private static final long serialVersionUID = 1L;
+		int index;
+		@Override
+		public void action() {
+			
+			// TODO Auto-generated method stub
+			ACLMessage msg2 = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+			if (msg2 != null) {		
+				index++;
+				logger.info("Diffuseur received " + msg2.getContent() + " from "+ msg2.getSender());
+			}
+		}
 
+		@Override
+		public boolean done() {
+//			// TODO Auto-generated method stub
+//
+		
+			return index == eventReactionRepo.findAll().size();
+		}
+
+	}
 	private class AgentTemplateSendBehaviour extends Behaviour {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
 		private int p = 0;
+		private final EventNameRepository eventNameRepo = ApplicationContextProvider.getApplicationContext()
+				.getBean(EventNameRepository.class);
+		private  final EventInfoRepository eventInfoRepo = ApplicationContextProvider.getApplicationContext()
+				.getBean(EventInfoRepository.class);
+		private  final AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext()
+				.getBean(AgentRepository.class);
+
+		private  final	GoalInfoRepository goalInfoRepo = ApplicationContextProvider.getApplicationContext()
+				.getBean(GoalInfoRepository.class);
+		private  final	EventReactionRepository eventReactionRepo = ApplicationContextProvider.getApplicationContext()
+				.getBean(EventReactionRepository.class);
+		private  final OCCRepository OCCRepo = ApplicationContextProvider.getApplicationContext().getBean(OCCRepository.class);
 
 		public void action() {
 			ACLMessage msg2 = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-			EventNameRepository eventNameRepo = ApplicationContextProvider.getApplicationContext()
-					.getBean(EventNameRepository.class);
-			EventInfoRepository eventInfoRepo = ApplicationContextProvider.getApplicationContext()
-					.getBean(EventInfoRepository.class);
-			AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext()
-					.getBean(AgentRepository.class);
-			ActionRepository actionRepo = ApplicationContextProvider.getApplicationContext()
-					.getBean(ActionRepository.class);
-			GoalInfoRepository goalInfoRepo = ApplicationContextProvider.getApplicationContext()
-					.getBean(GoalInfoRepository.class);
-			EventReactionRepository eventReactionRepo = ApplicationContextProvider.getApplicationContext()
-					.getBean(EventReactionRepository.class);
-			OCCRepository OCCRepo = ApplicationContextProvider.getApplicationContext().getBean(OCCRepository.class);
-
+		
 			if (msg2 != null) {
 				String message = msg2.getContent();
 				String msgType = (message.split(":"))[0];
@@ -102,12 +128,12 @@ public class AgentTemplate extends Agent {
 				Optional<com.IA.decision.multiAgents.BO.Agent> agent = agentRepo.findById(agentId);
 				if (msgType.equals("event")) {
 					logger.info(
-							"AgentTemplate received event message" + msg2.getContent() + " from Sender : " + msg2.getSender());
+							"AgentTemplate received event message " + msg2.getContent() + " from Sender : " + msg2.getSender());
 
 					Optional<EventName> eventName = eventNameRepo.findById(Long.parseLong((message.split(":"))[1]));
-					GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(eventName.get().getGoalName().getId(),
-							agentId);
-					EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent(eventName.get().getId(), agentId);
+					GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(agentId,eventName.get().getGoalName().getId()
+							);
+					EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent( agentId, eventName.get().getId());
 					Double impact = eventInfo.getEventIntensityLevel() * goalInfo.getWeight();
 					Optional<OCC> optocc = OCCRepo.findById(agent.get().getId());
 					OCC occ;
@@ -127,6 +153,10 @@ public class AgentTemplate extends Agent {
 					EventReaction eventReaction = eventReactionRepo.findByEventInfo(eventInfo);
 					ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
 					msg3.setContent("eventReaction:" + eventReaction.getId());
+					for(com.IA.decision.multiAgents.BO.Agent ag : agentRepo.findAll())
+					{
+					msg3.addReceiver(new AID(ag.getName(), AID.ISLOCALNAME));
+					}
 					send(msg3);
 
 					p++;
@@ -175,7 +205,7 @@ public class AgentTemplate extends Agent {
 		public boolean done() {
 			// TODO Auto-generated method stub
 
-			return p == 4;
+			return p == eventNameRepo.findAll().size();
 
 		}
 

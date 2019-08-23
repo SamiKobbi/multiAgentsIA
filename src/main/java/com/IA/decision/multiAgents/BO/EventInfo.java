@@ -17,6 +17,10 @@ public class EventInfo {
 		this.eventIntensityLevel = eventIntensityLevel;
 		
 	}
+	public EventInfo()
+	{
+		
+	}
 	private Boolean eventDegree;
 	private Double eventIntensityLevel;
 	@OneToOne
