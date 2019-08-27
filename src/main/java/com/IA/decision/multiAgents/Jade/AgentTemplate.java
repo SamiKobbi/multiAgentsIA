@@ -133,21 +133,66 @@ public class AgentTemplate extends Agent {
 					GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(agentId,eventName.get().getGoalName().getId()
 							);
 					EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent( agentId, eventName.get().getId());
-					Double impact = eventInfo.getEventIntensityLevel() * goalInfo.getWeight();
-					Optional<OCC> optocc = OCCRepo.findById(agent.get().getId());
+					
+					Optional<OCC> optocc = OCCRepo.findByAgent(agent.get());
+					
 					OCC occ;
+					Double impact = eventInfo.getEventIntensityLevel() * goalInfo.getWeight();
 					if (optocc.isPresent()) {
 						occ = optocc.get();
+						
+						if (eventInfo.getEventDegree()) {
+							if(impact + occ.getJoy() > 1)
+							{
+								occ.setJoy(1);
+							}
+							else
+							{
+								occ.setJoy(impact + occ.getJoy());
+							}
+							if(occ.getDistress()-impact < 0)
+							{
+								occ.setDistress(0);
+							}
+							else
+							{
+								occ.setDistress(occ.getDistress()-impact);
+							}
+							
+						}
+						else
+						{
+							if(impact + occ.getDistress() > 1)
+							{
+								occ.setDistress(1);
+							}
+							else
+							{
+								occ.setDistress(impact + occ.getDistress());
+							}
+							if(occ.getJoy()-impact < 0)
+							{
+								occ.setJoy(0);
+							}
+							else
+							{
+								occ.setJoy(occ.getJoy()-impact);
+							}
+						}
 					} else {
 						occ = new OCC();
+						if (eventInfo.getEventDegree()) {
+							occ.setJoy(impact);
+						}
+						else
+						{
+							occ.setDistress(impact);
+						}
 					}
 					occ.setAgent(agent.get());
 					//occ.setAgentId(agent.get().getId());
-					if (eventInfo.getEventDegree()) {
-						occ.setJoy(impact);
-					} else {
-						occ.setDistress(impact);
-					}
+					
+					
 					OCCRepo.save(occ);
 					EventReaction eventReaction = eventReactionRepo.findByEventInfo(eventInfo);
 					ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
