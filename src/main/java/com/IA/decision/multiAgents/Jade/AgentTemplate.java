@@ -66,39 +66,38 @@ public class AgentTemplate extends Agent {
 		} catch (FIPAException e) {
 			e.printStackTrace();
 		}
-		addBehaviour(new AgentTemplateSendBehaviour());
 		addBehaviour(new AgentTemplateReceiveBehaviour());
+		//addBehaviour(new AgentTemplateReceiveBehaviour());
 		// addBehaviour(new AgentBehaviour2());
 	}
-	private class AgentTemplateReceiveBehaviour extends Behaviour {
-		/**
-		 * 
-		 */
-		private  final	EventReactionRepository eventReactionRepo = ApplicationContextProvider.getApplicationContext()
-				.getBean(EventReactionRepository.class);
-		private static final long serialVersionUID = 1L;
-		int index;
-		@Override
-		public void action() {
-			
-			// TODO Auto-generated method stub
-			ACLMessage msg2 = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-			if (msg2 != null) {		
-				index++;
-				logger.info("Diffuseur received " + msg2.getContent() + " from "+ msg2.getSender());
-			}
-		}
-
-		@Override
-		public boolean done() {
+//	private class AgentTemplateReceiveBehaviour extends Behaviour {
+//		/**
+//		 * 
+//		 */
+//		private  final	EventReactionRepository eventReactionRepo = ApplicationContextProvider.getApplicationContext()
+//				.getBean(EventReactionRepository.class);
+//		private static final long serialVersionUID = 1L;
+//		int index;
+//		@Override
+//		public void action() {
+//			
 //			// TODO Auto-generated method stub
+//			ACLMessage msg2 = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+//			if (msg2 != null) {		
+//				index++;
+//							}
+//		}
 //
-		
-			return index == eventReactionRepo.findAll().size();
-		}
-
-	}
-	private class AgentTemplateSendBehaviour extends Behaviour {
+//		@Override
+//		public boolean done() {
+////			// TODO Auto-generated method stub
+////
+//		
+//			return index == eventReactionRepo.findAll().size();
+//		}
+//
+//	}
+	private class AgentTemplateReceiveBehaviour extends Behaviour {
 		/**
 		 * 
 		 */
@@ -128,7 +127,7 @@ public class AgentTemplate extends Agent {
 				Optional<com.IA.decision.multiAgents.BO.Agent> agent = agentRepo.findById(agentId);
 				if (msgType.equals("event")) {
 					logger.info(
-							"AgentTemplate received event message " + msg2.getContent() + " from Sender : " + msg2.getSender());
+							getLocalName()+ " received event message " + msg2.getContent() + " from Sender : " + msg2.getSender());
 
 					Optional<EventName> eventName = eventNameRepo.findById(Long.parseLong((message.split(":"))[1]));
 					GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(agentId,eventName.get().getGoalName().getId()
@@ -143,7 +142,7 @@ public class AgentTemplate extends Agent {
 						occ = new OCC();
 					}
 					occ.setAgent(agent.get());
-					occ.setAgentId(agent.get().getId());
+					//occ.setAgentId(agent.get().getId());
 					if (eventInfo.getEventDegree()) {
 						occ.setJoy(impact);
 					} else {
@@ -153,13 +152,22 @@ public class AgentTemplate extends Agent {
 					EventReaction eventReaction = eventReactionRepo.findByEventInfo(eventInfo);
 					ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
 					msg3.setContent("eventReaction:" + eventReaction.getId());
-					for(com.IA.decision.multiAgents.BO.Agent ag : agentRepo.findAll())
+					for(com.IA.decision.multiAgents.BO.Agent agentDiff : agentRepo.findAll())
 					{
-					msg3.addReceiver(new AID(ag.getName(), AID.ISLOCALNAME));
+						if(!agentDiff.getName().equals(agent.get().getName()))
+						{
+							msg3.addReceiver(new AID(agentDiff.getName(), AID.ISLOCALNAME));
+							logger.info("Sending event reaction to "+agentDiff.getName()+ " with id "+ eventReaction.getId());
+						}
 					}
 					send(msg3);
 
 					p++;
+				}
+				else if (msgType.equals("eventReaction"))
+				{
+					logger.info( getLocalName()+" received event message reaction : " + msg2.getContent() + " from "+ msg2.getSender());
+
 				}
 //				else if (msgType.equals("action"))
 //				{
@@ -205,7 +213,7 @@ public class AgentTemplate extends Agent {
 		public boolean done() {
 			// TODO Auto-generated method stub
 
-			return p == eventNameRepo.findAll().size();
+			return p == eventNameRepo.findAll().size()+eventReactionRepo.findAll().size() ;
 
 		}
 

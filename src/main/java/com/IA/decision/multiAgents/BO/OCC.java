@@ -11,18 +11,13 @@ import javax.persistence.PrimaryKeyJoinColumn;
 public class OCC {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long agentId;
+	private Long id;
 
-	public Long getAgentId() {
-		return agentId;
-	}
-	public void setAgentId(Long agentId) {
-		this.agentId = agentId;
-	}
+
 	@OneToOne
-	@PrimaryKeyJoinColumn
 	private Agent agent;
 	
+
 	public Agent getAgent() {
 		return agent;
 	}
