@@ -156,6 +156,7 @@ public class MainController{
 	public void initialize() {
 
 		agentsComboBox.setConverter(new AgentNameStringConverter());
+		agentNameExecutionEventComboBox.setConverter(new AgentNameStringConverter());
 		agentSrc.setConverter(new AgentNameStringConverter());
 		agentDest.setConverter(new AgentNameStringConverter());
 		eventNameExecutionComboBox.setConverter(new EventNameStringConverter());
@@ -163,7 +164,8 @@ public class MainController{
 		eventNameComboBox.setConverter(new EventNameStringConverter());
 		actionComboBox.setConverter(new ActionNameStringConverter());
 		agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
-	
+		
+		agentNameExecutionEventComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentSrc.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentDest.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentsComboBox.getSelectionModel().selectFirst();
