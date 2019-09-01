@@ -11,9 +11,9 @@ public class EventInfo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	public EventInfo(Boolean eventDegree, Double eventIntensityLevel) {
+	public EventInfo(Double eventIntensityLevel) {
 		super();
-		this.eventDegree = eventDegree;
+	
 		this.eventIntensityLevel = eventIntensityLevel;
 		
 	}
@@ -21,19 +21,15 @@ public class EventInfo {
 	{
 		
 	}
-	private Boolean eventDegree;
+	
 	private Double eventIntensityLevel;
 	@OneToOne
 	private Agent agent;
 	@ManyToOne
 	private EventName eventName;
 	
-	public Boolean getEventDegree() {
-		return eventDegree;
-	}
-	public void setEventDegree(Boolean eventDegree) {
-		this.eventDegree = eventDegree;
-	}
+
+	
 	public Double getEventIntensityLevel() {
 		return eventIntensityLevel;
 	}

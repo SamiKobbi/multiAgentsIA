@@ -12,10 +12,21 @@ public class EventName {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	public EventName(String name, Boolean confirmed) {
+	
+	private Boolean eventDegree;
+	public Boolean getEventDegree() {
+		return eventDegree;
+	}
+
+	public void setEventDegree(Boolean eventDegree) {
+		this.eventDegree = eventDegree;
+	}
+
+	public EventName(String name, Boolean confirmed, Boolean eventDegree) {
 		super();
 		this.name = name;
 		this.confirmed = confirmed;
+		this.eventDegree = eventDegree;
 	}
 	private Boolean confirmed;
 

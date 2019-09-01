@@ -91,11 +91,17 @@ public class MainController{
 	@FXML
 	public CheckBox degreeCheckBox;
 	@FXML
+	public ComboBox<Agent> agentNameExecutionEventComboBox;
+	@FXML
+	public ComboBox<EventName> eventNameExecutionComboBox;
+	@FXML
 	public ComboBox<EventName> eventNameComboBox;
 	@FXML
 	public TextField eventReaction;
 	@FXML
-	public Button addEvent;
+	public Button addEventName;
+	@FXML
+	public Button addEventExecution;
 	// event
 
 	// Action
@@ -114,10 +120,12 @@ public class MainController{
 	@FXML
 	public CheckBox actionDeg;
 	@FXML
+	public ComboBox<Agent> agentNameEventComboBox;
+	@FXML
 	public ComboBox<Action> actionComboBox;
 	@FXML
 	public Button addAction;
-	// Action
+		// Action
 	// reports
 	@FXML
 	LineChart emotionsChart;
@@ -147,15 +155,19 @@ public class MainController{
 		agentsComboBox.setConverter(new AgentNameStringConverter());
 		agentSrc.setConverter(new AgentNameStringConverter());
 		agentDest.setConverter(new AgentNameStringConverter());
+		agentNameEventComboBox.setConverter(new AgentNameStringConverter());
+		eventNameExecutionComboBox.setConverter(new EventNameStringConverter());
 		goalNameComboBox.setConverter(new GoalNameStringConverter());
 		eventNameComboBox.setConverter(new EventNameStringConverter());
 		actionComboBox.setConverter(new ActionNameStringConverter());
 		agentsComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
+		agentNameEventComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentSrc.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentDest.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 		agentsComboBox.getSelectionModel().selectFirst();
 		goalNameComboBox.setItems(FXCollections.observableArrayList(goalNameRepo.findAll()));
 		eventNameComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findAll()));
+		eventNameExecutionComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findAll()));
 		actionComboBox.setItems(FXCollections.observableArrayList(actionRepo.findAll()));
 		goalNameComboBox.getSelectionModel().selectFirst();
 
@@ -212,25 +224,24 @@ public class MainController{
 
 		});
 		
-		addEvent.setOnAction(event -> {
-			EventName evName = new EventName(eventName.getText(), confirmCheckBox.isSelected());
+		addEventName.setOnAction(event -> {
+			EventName evName = new EventName(eventName.getText(), confirmCheckBox.isSelected(),degreeCheckBox.isSelected());
 			evName.setGoalName(goalNameComboBox.getSelectionModel().getSelectedItem());
-			EventInfo evInfo = new EventInfo(degreeCheckBox.isSelected(), Double.parseDouble(eventIntensity.getText()) );
-			evInfo.setEventName(evName);
-			evInfo.setAgent(agentsComboBox.getSelectionModel().getSelectedItem());
-			EventReaction evReaction = new EventReaction(eventReaction.getText());
-			Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
-
-			
-			
-			
-			//ev.setGoalInfo(goalInfo);
-			//ev.setGoalInfo(goalNameComboBox.getSelectionModel().getSelectedItem());
 			eventNameComboBox.getItems().add(evName);
 			eventNameRepo.saveAll(eventNameComboBox.getItems());
+			eventNameExecutionComboBox.getItems().add(evName);
+			clearSelectionEventName();
+		});
+		
+		addEventExecution.setOnAction(event -> {
+		
+			EventInfo evInfo = new EventInfo(Double.parseDouble(eventIntensity.getText()) );
+			evInfo.setEventName(eventNameExecutionComboBox.getSelectionModel().getSelectedItem());
+			evInfo.setAgent(agentNameEventComboBox.getSelectionModel().getSelectedItem());
+			EventReaction evReaction = new EventReaction(eventReaction.getText());
 			eventInfoRepo.save(evInfo);
 			eventReactionRepo.save(evReaction);
-			clearSelectionEvent();
+			clearSelectionEventExecution();
 		}
 
 		);
@@ -249,6 +260,7 @@ public class MainController{
 				OCEANRepo.save(ocean);
 				agentSrc.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 				agentDest.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
+				agentNameEventComboBox.setItems(FXCollections.observableArrayList(agentRepo.findAll()));
 				clearSelectionAgent();
 			} else {
 				Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -276,14 +288,14 @@ public class MainController{
 		
 		eventNameComboBox.valueProperty().addListener((ChangeListener<EventName>) (ov, oldValue, newEvent) -> {
 			if (newEvent != null) {
-				Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
+			//	Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
 				
-				EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent(agent.getId(), newEvent.getId());
+				//EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent(agent.getId(), newEvent.getId());
 				eventName.setText(newEvent.getName());
-				eventIntensity.setText(eventInfo.getEventIntensityLevel().toString());
+				//eventIntensity.setText(eventInfo.getEventIntensityLevel().toString());
 				confirmCheckBox.setSelected(newEvent.getConfirmed());
-				degreeCheckBox.setSelected(eventInfo.getEventDegree());
-				eventReaction.setText(eventReactionRepo.findByEventInfo(eventInfo).getReactionName());
+				degreeCheckBox.setSelected(newEvent.getEventDegree());
+				//eventReaction.setText(eventReactionRepo.findByEventInfo(eventInfo).getReactionName());
 			}
 			
 		});
@@ -302,11 +314,14 @@ public class MainController{
 
 	}
 	
-	private void clearSelectionEvent() {
+	private void clearSelectionEventName() {
 		eventName.clear();
+		eventNameComboBox.getSelectionModel().clearSelection();
+		agentNameEventComboBox.getSelectionModel().clearSelection();
+	}
+	private void clearSelectionEventExecution() {
 		eventIntensity.clear();
 		eventReaction.clear();
-		eventNameComboBox.getSelectionModel().clearSelection();
 	}
 	private void clearSelectionAction() {
 		actionMessage.clear();

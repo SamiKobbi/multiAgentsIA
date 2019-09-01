@@ -67,40 +67,113 @@ public class AgentTemplate extends Agent {
 			e.printStackTrace();
 		}
 		addBehaviour(new AgentTemplateReceiveBehaviour());
-		//addBehaviour(new AgentTemplateReceiveBehaviour());
+		addBehaviour(new AgentTemplateSendBehaviour());
 		// addBehaviour(new AgentBehaviour2());
 	}
-//	private class AgentTemplateReceiveBehaviour extends Behaviour {
-//		/**
-//		 * 
-//		 */
-//		private  final	EventReactionRepository eventReactionRepo = ApplicationContextProvider.getApplicationContext()
-//				.getBean(EventReactionRepository.class);
-//		private static final long serialVersionUID = 1L;
-//		int index;
-//		@Override
-//		public void action() {
-//			
-//			// TODO Auto-generated method stub
-//			ACLMessage msg2 = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-//			if (msg2 != null) {		
-//				index++;
-//							}
-//		}
+	private class AgentTemplateSendBehaviour extends Behaviour {
+		/**
+		 * 
+		 */
+		private int index = 0;
+		private static final long serialVersionUID = 2L;
+		private  final AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext()
+				.getBean(AgentRepository.class);
+		private  final	ActionRepository actionRepo = ApplicationContextProvider.getApplicationContext()
+				.getBean(ActionRepository.class);
+		@Override
+		public void action() {
+			Long agentId = agentRepo.findAll().stream().filter(agent -> agent.getName().equals(getLocalName()))
+					.findAny().get().getId();
+			Optional<com.IA.decision.multiAgents.BO.Agent> agent = agentRepo.findById(agentId);
+			List<Action> actions = actionRepo.findByAgentSrc(agent.get());
+			for(Action action : actions)
+			{
+						ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
+						msg3.setContent("action:" + action.getId());
+						msg3.addReceiver(new AID(action.getAgentDest().getName(), AID.ISLOCALNAME));
+						logger.info("Sending action from "+agent.get().getName()+ " to "+action.getAgentDest().getName() +" with id "+ action.getId());
+						send(msg3);
+						index++;
+						//logger.info("action index:"+index);
+				
+			}
+		}
+
+		@Override
+		public boolean done() {
+			Long agentId = agentRepo.findAll().stream().filter(agent -> agent.getName().equals(getLocalName()))
+					.findAny().get().getId();
+			Optional<com.IA.decision.multiAgents.BO.Agent> agent = agentRepo.findById(agentId);
+			List<Action> actions = actionRepo.findByAgentSrc(agent.get());
+			return index == actions.size();
+		}
 //
-//		@Override
-//		public boolean done() {
-////			// TODO Auto-generated method stub
-////
-//		
-//			return index == eventReactionRepo.findAll().size();
-//		}
-//
-//	}
+}
 	private class AgentTemplateReceiveBehaviour extends Behaviour {
 		/**
 		 * 
 		 */
+		private void updateOCCVector(Optional<OCC> optocc, Optional<com.IA.decision.multiAgents.BO.Agent> agent, Double impact, Boolean eventDegree)
+		{
+			OCC occ;
+			logger.info("Updating OCC agent: "+ agent.get().getName()+" impact: "+impact+" event degree : "+eventDegree);
+			if (optocc.isPresent()) {
+				occ = optocc.get();
+				
+				if (eventDegree) {
+					
+					if(impact + occ.getJoy() > 1)
+					{
+						occ.setJoy(1);
+					}
+					else
+					{
+						occ.setJoy(impact + occ.getJoy());
+					}
+					if(occ.getDistress()-impact < 0)
+					{
+						occ.setDistress(0);
+					}
+					else
+					{
+						occ.setDistress(occ.getDistress()-impact);
+					}
+					
+				}
+				else
+				{
+					if(impact + occ.getDistress() > 1)
+					{
+						occ.setDistress(1);
+					}
+					else
+					{
+						occ.setDistress(impact + occ.getDistress());
+					}
+					if(occ.getJoy()-impact < 0)
+					{
+						occ.setJoy(0);
+					}
+					else
+					{
+						occ.setJoy(occ.getJoy()-impact);
+					}
+				}
+			} else {
+				
+				occ = new OCC();
+				if (eventDegree) {
+					occ.setJoy(impact);		
+				}
+				else
+				{
+				occ.setDistress(impact);
+				}
+			}
+			occ.setAgent(agent.get());
+			OCCRepo.save(occ);
+		}
+		
 		private static final long serialVersionUID = 1L;
 		private int p = 0;
 		private final EventNameRepository eventNameRepo = ApplicationContextProvider.getApplicationContext()
@@ -115,7 +188,9 @@ public class AgentTemplate extends Agent {
 		private  final	EventReactionRepository eventReactionRepo = ApplicationContextProvider.getApplicationContext()
 				.getBean(EventReactionRepository.class);
 		private  final OCCRepository OCCRepo = ApplicationContextProvider.getApplicationContext().getBean(OCCRepository.class);
-
+		private  final	ActionRepository actionRepo = ApplicationContextProvider.getApplicationContext()
+				.getBean(ActionRepository.class);
+		
 		public void action() {
 			ACLMessage msg2 = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 		
@@ -127,7 +202,7 @@ public class AgentTemplate extends Agent {
 				Optional<com.IA.decision.multiAgents.BO.Agent> agent = agentRepo.findById(agentId);
 				if (msgType.equals("event")) {
 					logger.info(
-							getLocalName()+ " received event message " + msg2.getContent() + " from Sender : " + msg2.getSender());
+							getLocalName()+ " received event message id: " +(message.split(":"))[1]+" event name:" + msg2.getContent() );
 
 					Optional<EventName> eventName = eventNameRepo.findById(Long.parseLong((message.split(":"))[1]));
 					GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(agentId,eventName.get().getGoalName().getId()
@@ -135,65 +210,10 @@ public class AgentTemplate extends Agent {
 					EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent( agentId, eventName.get().getId());
 					
 					Optional<OCC> optocc = OCCRepo.findByAgent(agent.get());
-					
-					OCC occ;
 					Double impact = eventInfo.getEventIntensityLevel() * goalInfo.getWeight();
-					if (optocc.isPresent()) {
-						occ = optocc.get();
-						
-						if (eventInfo.getEventDegree()) {
-							if(impact + occ.getJoy() > 1)
-							{
-								occ.setJoy(1);
-							}
-							else
-							{
-								occ.setJoy(impact + occ.getJoy());
-							}
-							if(occ.getDistress()-impact < 0)
-							{
-								occ.setDistress(0);
-							}
-							else
-							{
-								occ.setDistress(occ.getDistress()-impact);
-							}
-							
-						}
-						else
-						{
-							if(impact + occ.getDistress() > 1)
-							{
-								occ.setDistress(1);
-							}
-							else
-							{
-								occ.setDistress(impact + occ.getDistress());
-							}
-							if(occ.getJoy()-impact < 0)
-							{
-								occ.setJoy(0);
-							}
-							else
-							{
-								occ.setJoy(occ.getJoy()-impact);
-							}
-						}
-					} else {
-						occ = new OCC();
-						if (eventInfo.getEventDegree()) {
-							occ.setJoy(impact);
-						}
-						else
-						{
-							occ.setDistress(impact);
-						}
-					}
-					occ.setAgent(agent.get());
-					//occ.setAgentId(agent.get().getId());
 					
+					updateOCCVector(optocc, agent , impact , eventName.get().getEventDegree());
 					
-					OCCRepo.save(occ);
 					EventReaction eventReaction = eventReactionRepo.findByEventInfo(eventInfo);
 					ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
 					msg3.setContent("eventReaction:" + eventReaction.getId());
@@ -211,54 +231,33 @@ public class AgentTemplate extends Agent {
 				}
 				else if (msgType.equals("eventReaction"))
 				{
-					logger.info( getLocalName()+" received event message reaction : " + msg2.getContent() + " from "+ msg2.getSender());
+					logger.info( getLocalName()+" received event message reaction : " + msg2.getContent() + " from "+ msg2.getSender().getLocalName());
 
+					p++;
 				}
-//				else if (msgType.equals("action"))
-//				{
-//			
-//					Optional<OCC> optocc = OCCRepo.findById(agent.get().getId());
-//					OCC occ;
-//					if(optocc.isPresent())
-//					{
-//						occ = optocc.get();
-//					}
-//					else
-//					{
-//						occ = new OCC();
-//					}
-//					//praise worthy
-//					//blame worthy
-//					//it is a variable storing the value returned from the formula updating the occ vector
-//					//praise worthy = action approval level * degree 
-//					//proud should be equal to that value
-//					Optional<Action> action = actionRepo.findById(Long.parseLong((message.split(":"))[1]));
-//					double praiseWorthy ;
-//					double blameWorthy ;
-//					if(action.get().getActionDegree())
-//					{
-//						 praiseWorthy = action.get().getApprovalDegreeLevel();
-//					 	 occ.setProud(praiseWorthy);
-//					}
-//					else
-//					{
-//						blameWorthy = action.get().getApprovalDegreeLevel();
-//						occ.setShame(blameWorthy);
-//					}
-//					
-//					occ.setAgent(agent.get());
-//					occ.setAgentId(agent.get().getId());
-//				
-//					OCCRepo.save(occ);
-//					p++;
-//				}
+				else if (msgType.equals("action"))
+				{
+			
+					Optional<OCC> optocc = OCCRepo.findByAgent(agent.get());
+					Optional<Action> action = actionRepo.findById(Long.parseLong((message.split(":"))[1]));
+					logger.info(
+							getLocalName()+ " received " + msg2.getContent() + " from Sender : " + msg2.getSender().getLocalName());
+
+					//praise worthy
+					//blame worthy
+					//it is a variable storing the value returned from the formula updating the occ vector
+					//praise worthy = action approval level * degree 
+					//proud should be equal to that value
+					updateOCCVector(optocc, agent , action.get().getApprovalDegreeLevel() , action.get().getActionDegree());
+					p++;
+				}
 			}
 		}
 
 		public boolean done() {
 			// TODO Auto-generated method stub
 
-			return p == eventNameRepo.findAll().size()+eventReactionRepo.findAll().size() ;
+			return p == eventNameRepo.findAll().size()+eventReactionRepo.findAll().size() + actionRepo.findAll().size() ;
 
 		}
 

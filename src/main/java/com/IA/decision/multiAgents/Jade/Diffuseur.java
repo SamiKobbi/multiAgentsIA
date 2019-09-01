@@ -69,7 +69,7 @@ public class Diffuseur extends Agent {
 					List<EventName> events = eventNameRepo.findAll();
 					for(com.IA.decision.multiAgents.BO.EventName event:events)
 					{
-						logger.info("<Diffuseur Agent>: Diffusing message "+event.getName());
+						logger.info("<Diffuseur Agent>: Diffusing message id:"+event.getId()+" event:"+event.getName());
 						ACLMessage msg3= new ACLMessage(ACLMessage.INFORM) ;
 						msg3.setContent("event:"+event.getId().toString());
 						for(com.IA.decision.multiAgents.BO.Agent agent : agents)
@@ -79,26 +79,7 @@ public class Diffuseur extends Agent {
 						send(msg3);
 						o++;
 					}
-//					List<com.IA.decision.multiAgents.BO.Action> actions = actionRepo.findByAgentDest(agent);
-//					for(com.IA.decision.multiAgents.BO.Action action : actions)
-//					{
-//						ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
-//						msg3.setContent("action:" + action.getId().toString());
-//						msg3.addReceiver(new AID(agent.getName(), AID.ISLOCALNAME));
-//						msg3.setSender(new AID(action.getAgentSrc().getName(), AID.ISLOCALNAME));
-//						
-//						// msg3.addReceiver(new AID("Agent3", AID.ISLOCALNAME));
-//						// Envoyer le message � l'agent Vendeur
-//						send(msg3);
-//						o++;
-//					}
-	
-				// o++;
-				
-				
-				//msg3.setContent(content);
 
-				
 			} catch (Exception e) {
 				logger.error("Erreur lors de l'accés au fichier !");
 				e.printStackTrace();
