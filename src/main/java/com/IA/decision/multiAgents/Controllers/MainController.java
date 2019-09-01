@@ -322,10 +322,20 @@ public class MainController{
 				
 				goalName.setText(newGoal.getName());
 				Agent agent = agentsComboBox.getSelectionModel().getSelectedItem();
+				if(agent != null)
+				{
 				GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(agent.getId(), newGoal.getId());
 				goalWeight.setText(goalInfo.getWeight().toString());
 				eventNameComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findByGoalName(newGoal)));
-
+				}
+				else
+				{
+					Alert alert = new Alert(Alert.AlertType.INFORMATION);
+					alert.setTitle("Goal Failed");
+					alert.setHeaderText("Agent is not selected");
+					alert.setContentText("Please select an agent!");
+					alert.showAndWait();
+				}
 			}
 		});
 
