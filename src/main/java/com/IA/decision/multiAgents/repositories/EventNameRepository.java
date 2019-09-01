@@ -12,5 +12,5 @@ import com.IA.decision.multiAgents.BO.GoalName;
 public interface EventNameRepository extends JpaRepository<EventName, Long>  {
 	
 	List<EventName> findByGoalName(GoalName goalName);
-	List<EventName> findByAgent(Agent agent);
+	
 }

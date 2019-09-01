@@ -58,8 +58,6 @@ public class EventName {
 	}
 
 
-	@ManyToOne
-	private Agent agent;
 	public GoalName getGoalName() {
 		return goalName;
 	}
