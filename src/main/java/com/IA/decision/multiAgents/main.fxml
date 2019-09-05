@@ -91,8 +91,7 @@
                                              <children>
                                                 <TextField fx:id="actionMessage" layoutX="189.0" layoutY="42.0" prefHeight="12.0" prefWidth="222.0" />
                                                 <TextField fx:id="actionApprDegLvl" layoutX="176.0" layoutY="122.0" prefHeight="25.0" prefWidth="223.0" />
-                                                <CheckBox fx:id="reqCheckbox" layoutX="135.0" layoutY="79.0" mnemonicParsing="false" text="Request" />
-                                                <CheckBox fx:id="resCheckbox" layoutX="227.0" layoutY="79.0" mnemonicParsing="false" text="Response" />
+                                                <CheckBox fx:id="reqCheckbox" layoutX="163.0" layoutY="81.0" mnemonicParsing="false" text="Request or Response" />
                                                 <CheckBox fx:id="actionDeg" layoutX="333.0" layoutY="79.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="139.0" text="Action Degree" />
                                                 <Label layoutX="16.0" layoutY="36.0" prefHeight="17.0" prefWidth="113.0" text="Message" />
                                                 <Label layoutX="8.0" layoutY="127.0" prefHeight="21.0" prefWidth="155.0" text="Approval degree level" />

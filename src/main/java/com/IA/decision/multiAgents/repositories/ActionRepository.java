@@ -12,4 +12,5 @@ import com.IA.decision.multiAgents.BO.EventName;
 
 public interface ActionRepository extends JpaRepository<Action, Long> {
 	List<Action> findByAgentSrc(Agent agentSrc);
+
 }
