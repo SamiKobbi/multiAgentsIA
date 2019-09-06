@@ -22,6 +22,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.util.leap.Properties;
 import jade.wrapper.*;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
@@ -61,9 +62,12 @@ public class Supervisor extends Agent {
 
 			rt = Runtime.instance();
 			ProfileImpl p = new ProfileImpl(false);
-			Path currentRelativePath = Paths.get("");
+		
 			container = rt.createAgentContainer(p);
-			FileAlterationObserver observer = new FileAlterationObserver("C:\\multiAgents");
+			File currentDirectory = new File(new File(".").getAbsolutePath());
+			
+			File parentDirectory = new File(currentDirectory.getParent());
+			FileAlterationObserver observer = new FileAlterationObserver(new File(parentDirectory.getParent()).getParent() + "\\go");
 			FileAlterationMonitor monitor = new FileAlterationMonitor(100);
 			FileAlterationListener listener = new FileAlterationListenerAdaptor() {
 				  @Override

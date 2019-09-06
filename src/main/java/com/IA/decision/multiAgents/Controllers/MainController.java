@@ -3,6 +3,8 @@ package com.IA.decision.multiAgents.Controllers;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -201,7 +203,8 @@ public class MainController{
 			logger.info("go Agents");
 			    FileWriter fileWriter;
 				try {
-					fileWriter = new FileWriter("C:\\multiAgents\\file.txt");
+					Path currentDir = Paths.get("go");
+					fileWriter = new FileWriter(currentDir.toAbsolutePath().toString()+"/start.txt");
 					  fileWriter.write("go");
 					    fileWriter.close();
 				} catch (IOException e) {
