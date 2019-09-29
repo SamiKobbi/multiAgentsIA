@@ -200,7 +200,7 @@ public class MainController{
 
 		goButton.setOnAction(event -> {
 			 
-			logger.info("go Agents");
+			
 			    FileWriter fileWriter;
 				try {
 					Path currentDir = Paths.get("go");

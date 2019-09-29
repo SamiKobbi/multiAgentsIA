@@ -208,7 +208,9 @@ public class AgentTemplate extends Agent {
 					GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(agentId,eventName.get().getGoalName().getId()
 							);
 					EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent( agentId, eventName.get().getId());
-					
+					if(eventInfo != null)
+					{
+
 					Optional<OCC> optocc = OCCRepo.findByAgent(agent.get());
 					Double impact = eventInfo.getEventIntensityLevel() * goalInfo.getWeight();
 					
@@ -228,6 +230,8 @@ public class AgentTemplate extends Agent {
 					send(msg3);
 
 					p++;
+					
+				}
 				}
 				else if (msgType.equals("eventReaction"))
 				{

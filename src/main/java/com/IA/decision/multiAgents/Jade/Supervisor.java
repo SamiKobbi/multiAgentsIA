@@ -21,6 +21,8 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.util.leap.Properties;
 import jade.wrapper.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.monitor.FileAlterationListener;
@@ -49,6 +51,7 @@ public class Supervisor extends Agent {
 	private static AnnotationConfigApplicationContext context;
 	private static AgentContainer container ;
 	private static Runtime rt ;
+   
 	protected void setup() {
 		SpringApplicationBuilder springApplicationBuilder = new SpringApplicationBuilder(Supervisor.class)
 				.sources(Supervisor.class).properties(getProperties());
