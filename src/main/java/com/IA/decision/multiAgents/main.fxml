@@ -34,6 +34,7 @@
                        <Label layoutX="25.0" layoutY="54.0" text="Agents" />
                        <Button fx:id="saveAgent" layoutX="307.0" layoutY="384.0" mnemonicParsing="false" text="Save Agent" />
                         <Button fx:id="updateAgent" layoutX="420.0" layoutY="384.0" mnemonicParsing="false" text="Update Agent" />
+                        <Button fx:id="generateAgents" layoutX="132.0" layoutY="384.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="164.0" text="Generate Agents" />
                      </children></AnchorPane>
             </content>
           </Tab>

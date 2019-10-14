@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,6 +51,8 @@ public class MainController{
 	// agent
 	@FXML
 	public Button goButton;
+	@FXML
+	public Button generateAgents;
 	@FXML
 	public Button saveAgent;
 	@FXML
@@ -298,7 +302,14 @@ public class MainController{
 			eventNameComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findAll()));
 			eventNameExecutionComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findAll()));
 		});
-		
+		generateAgents.setOnAction(event -> {
+			List<Agent> agents = new LinkedList<> ();
+			for(int i=0;i<20;i++)
+			{
+				agents.add(new Agent("Agent"+Character.toString((char)(i+65))));
+			}
+			agentsComboBox.setItems(FXCollections.observableArrayList(agents));
+			});
 		addEventExecution.setOnAction(event -> {
 		
 			EventInfo evInfo = new EventInfo(Double.parseDouble(eventIntensity.getText()) );
