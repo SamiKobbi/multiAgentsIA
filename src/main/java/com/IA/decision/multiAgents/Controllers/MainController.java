@@ -90,7 +90,8 @@ public class MainController{
 	public TextField goalName;
 	@FXML
 	public TextField goalWeight;
-	
+	@FXML
+	public Button generateGoal;
 	@FXML
 	public Button addGoalExecution;
 	@FXML
@@ -127,6 +128,8 @@ public class MainController{
 
 	@FXML
 	public Button addEventName;
+	@FXML
+	public Button generateEventName;
 	@FXML
 	public Button addEventExecution;
 	// event
@@ -247,6 +250,53 @@ public class MainController{
 			goalWght.setWeight(Double.parseDouble(goalWeight.getText()));
 			goalInfoRepo.save(goalWght);
 		});
+		generateGoal.setOnAction(event -> {
+				
+				GoalName goalName = new GoalName("Success the exam");
+				goalNameRepo.save(goalName);
+
+				List<EventName> eventNames = new LinkedList<>();				
+				EventName eventName = new EventName("Bad mark",true,false);
+				eventName.setGoalName(goalName);
+				eventNames.add(eventName);
+				eventName = new EventName("Prospect bad mark", false, false);
+				eventName.setGoalName(goalName);
+				eventNames.add(eventName);
+				eventName = new EventName("Good mark", true, true);
+				eventName.setGoalName(goalName);
+				eventNames.add(eventName);
+				eventName = new EventName("Prospect good mark", true, true);
+				eventName.setGoalName(goalName);
+				eventNames.add(eventName);
+				eventNameRepo.saveAll(eventNames);
+				
+				goalName = new GoalName("Success the year");
+				goalNameRepo.save(goalName);
+				eventNames.clear();				
+				eventName = new EventName("Failing the activities",true,false);
+				eventName.setGoalName(goalName);
+				eventNames.add(eventName);
+				eventName = new EventName("Prospect failing the activities", false, false);
+				eventName.setGoalName(goalName);
+				eventNames.add(eventName);
+				eventName = new EventName("Have success the activities", true, true);
+				eventName.setGoalName(goalName);
+				eventNames.add(eventName);
+				eventName = new EventName("Prospect success the activities", false, true);
+				eventName.setGoalName(goalName);
+				eventNames.add(eventName);
+				eventNameRepo.saveAll(eventNames);
+				
+		
+				goalNames.add(new GoalName("Appreciation"));
+				goalNames.add(new GoalName("Social growth"));
+				
+			
+				
+			goalNameComboBox.setItems(FXCollections.observableArrayList(goalNames));
+			goalExecutionComboBox.setItems(FXCollections.observableArrayList(goalNames));
+			
+		});
 		addAction.setOnAction(event -> {
 			Action action = new Action(actionMessage.getText(), actionDeg.isSelected(), reqCheckbox.isSelected(), Double.parseDouble(actionApprDegLvl.getText()));
 			action.setAgentSrc(agentSrc.getSelectionModel().getSelectedItem());
@@ -302,6 +352,10 @@ public class MainController{
 			eventNameComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findAll()));
 			eventNameExecutionComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findAll()));
 		});
+		generateEventName.setOnAction(event -> {
+			List<EventName> eventNames = new LinkedList<>();
+		
+		});
 		generateAgents.setOnAction(event -> {
 			List<Agent> agents = new LinkedList<> ();
 			for(int i=0;i<20;i++)
@@ -309,6 +363,9 @@ public class MainController{
 				agents.add(new Agent("Agent"+Character.toString((char)(i+65))));
 			}
 			agentsComboBox.setItems(FXCollections.observableArrayList(agents));
+			agentSrc.setItems(FXCollections.observableArrayList(agents));
+			agentDest.setItems(FXCollections.observableArrayList(agents));
+			agentRepo.saveAll(agents);
 			});
 		addEventExecution.setOnAction(event -> {
 		

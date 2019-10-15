@@ -113,61 +113,56 @@ public class AgentTemplate extends Agent {
 		/**
 		 * 
 		 */
-		private void updateOCCVector(Optional<OCC> optocc, Optional<com.IA.decision.multiAgents.BO.Agent> agent, Double impact, Boolean eventDegree)
+		private void updateOCCVector(Optional<OCC> optocc, Optional<com.IA.decision.multiAgents.BO.Agent> agent, Double desirablity, Boolean eventDegree)
 		{
 			OCC occ;
-			logger.info("Updating OCC agent: "+ agent.get().getName()+" impact: "+impact+" event degree : "+eventDegree);
+			logger.info("Updating OCC agent: "+ agent.get().getName()+" desirablity: "+desirablity+" event degree : "+eventDegree);
 			if (optocc.isPresent()) {
 				occ = optocc.get();
-				
+				Double distress, joy;
 				if (eventDegree) {
 					
-					if(impact + occ.getJoy() > 1)
+					if(desirablity + occ.getJoy() > 1)
 					{
 						occ.setJoy(1);
 					}
 					else
 					{
-						occ.setJoy(impact + occ.getJoy());
+						occ.setJoy(desirablity + occ.getJoy());
 					}
-					if(occ.getDistress()-impact < 0)
+					distress = Math.abs(occ.getDistress()-desirablity);
+					if(distress < occ.getDistress())
 					{
-						occ.setDistress(0);
+						occ.setDistress(distress);
 					}
-					else
-					{
-						occ.setDistress(occ.getDistress()-impact);
-					}
-					
+				
 				}
 				else
 				{
-					if(impact + occ.getDistress() > 1)
+					if(desirablity + occ.getDistress() > 1)
 					{
 						occ.setDistress(1);
 					}
 					else
 					{
-						occ.setDistress(impact + occ.getDistress());
+						occ.setDistress(desirablity + occ.getDistress());
 					}
-					if(occ.getJoy()-impact < 0)
+					joy = Math.abs(occ.getJoy()- desirablity);
+					if(joy < occ.getJoy())
 					{
-						occ.setJoy(0);
+						occ.setJoy(joy);
 					}
-					else
-					{
-						occ.setJoy(occ.getJoy()-impact);
-					}
+					
 				}
 			} else {
 				
 				occ = new OCC();
 				if (eventDegree) {
-					occ.setJoy(impact);		
+					occ.setJoy(desirablity);		
 				}
 				else
 				{
-				occ.setDistress(impact);
+				occ.setDistress(desirablity);
 				}
 			}
 			occ.setAgent(agent.get());
@@ -212,9 +207,9 @@ public class AgentTemplate extends Agent {
 					{
 
 					Optional<OCC> optocc = OCCRepo.findByAgent(agent.get());
-					Double impact = eventInfo.getEventIntensityLevel() * goalInfo.getWeight();
+					Double desirability = eventInfo.getEventIntensityLevel() * goalInfo.getWeight();
 					
-					updateOCCVector(optocc, agent , impact , eventName.get().getEventDegree());
+					updateOCCVector(optocc, agent , desirability , eventName.get().getEventDegree());
 					
 					EventReaction eventReaction = eventReactionRepo.findByEventInfo(eventInfo);
 					ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
