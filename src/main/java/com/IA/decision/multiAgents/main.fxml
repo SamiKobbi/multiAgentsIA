@@ -33,8 +33,8 @@
                        <ComboBox fx:id="agentsComboBox" layoutX="120.0" layoutY="47.0" prefHeight="31.0" prefWidth="179.0" />
                        <Label layoutX="25.0" layoutY="54.0" text="Agents" />
                        <Button fx:id="saveAgent" layoutX="307.0" layoutY="384.0" mnemonicParsing="false" text="Save Agent" />
-                        <Button fx:id="updateAgent" layoutX="404.0" layoutY="384.0" mnemonicParsing="false" text="Update Agent" />
-                        <Button fx:id="generateAgents" layoutX="132.0" layoutY="384.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="164.0" text="Generate Agents" />
+                        <Button fx:id="updateAgent" layoutX="420.0" layoutY="384.0" mnemonicParsing="false" text="Update Agent" />
+                        <Button fx:id="generateAgents" layoutX="132.0" layoutY="384.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="164.0" text="Generate Agents" />
                      </children></AnchorPane>
             </content>
           </Tab>
@@ -56,9 +56,9 @@
                         <Button fx:id="addEventName" layoutX="194.0" layoutY="358.0" mnemonicParsing="false" text="Add Event Name" />
                         <Button fx:id="updateGoal" layoutX="337.0" layoutY="140.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="114.0" text="Update Goal" />
                         <Button fx:id="updateEventName" layoutX="337.0" layoutY="358.0" mnemonicParsing="false" text="Update Event Name" />
-                        <Button fx:id="generateGoal" layoutX="411.0" layoutY="431.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="179.0" text="Generate Goal and Events" />
-                     </children>
-                </AnchorPane>
+                        <Button fx:id="generateGoal" layoutX="469.0" layoutY="140.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="139.0" text="Generate Goal" />
+                        <Button fx:id="generateEventName" layoutX="500.0" layoutY="358.0" mnemonicParsing="false" text="Generate Events" />
+                     </children></AnchorPane>
             </content>
           </Tab>
             <Tab text="Execution">
@@ -82,9 +82,8 @@
                                                 <Label layoutX="30.0" layoutY="89.0" prefHeight="21.0" prefWidth="87.0" text="Intensity" />
                                                 <Label layoutX="14.0" layoutY="127.0" prefHeight="21.0" prefWidth="107.0" text="Event reaction" />
                                                 <TextField fx:id="eventReaction" layoutX="122.0" layoutY="122.0" prefHeight="25.0" prefWidth="245.0" />
-                                                <Button fx:id="addEventExecution" layoutX="43.0" layoutY="186.0" mnemonicParsing="false" text="Add Event Execution" />
-                                                <Button fx:id="updateEventExecution" layoutX="191.0" layoutY="186.0" mnemonicParsing="false" text="Update Event Execution" />
-                                                <Button fx:id="generateEventExecution" layoutX="355.0" layoutY="186.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="157.0" text="Generate Event Execution" />
+                                                <Button fx:id="addEventExecution" layoutX="167.0" layoutY="186.0" mnemonicParsing="false" text="Add Event Execution" />
+                                                <Button fx:id="updateEventExecution" layoutX="340.0" layoutY="186.0" mnemonicParsing="false" text="Update Event Execution" />
                                              </children>
                                           </AnchorPane>
                                        </content>
@@ -121,8 +120,9 @@
                                                 <Label layoutX="35.0" layoutY="22.0" prefHeight="21.0" prefWidth="51.0" text="Goals" />
                                                 <Label layoutX="37.0" layoutY="66.0" text="Agents" />
                                                 <ComboBox fx:id="agentsGoalExecution" layoutX="113.0" layoutY="61.0" prefHeight="31.0" prefWidth="179.0" />
-                                                <Button fx:id="addGoalExecution" layoutX="146.0" layoutY="168.0" mnemonicParsing="false" text="Add Goal Execution" />
-                                                <Button fx:id="updateGoalExecution" layoutX="325.0" layoutY="168.0" mnemonicParsing="false" text="Update Goal Execution" />
+                                                <Button fx:id="addGoalExecution" layoutY="168.0" mnemonicParsing="false" text="Add Goal Execution" />
+                                                <Button fx:id="updateGoalExecution" layoutX="160.0" layoutY="168.0" mnemonicParsing="false" text="Update Goal Execution" />
+                                                <Button fx:id="generateGoalExecution" layoutX="340.0" layoutY="168.0" mnemonicParsing="false" text="Generate Goal Execution" />
                                              </children>
                                           </AnchorPane>
                                       </content>

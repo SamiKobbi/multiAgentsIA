@@ -135,7 +135,8 @@ public class MainController{
 	public Button addEventExecution;
 	// event
 
-
+	@FXML
+	public Button generateGoalExecution;
 	@FXML
 	public ComboBox<Agent> agentSrc;
 	@FXML
@@ -349,7 +350,7 @@ public class MainController{
 
 		generateAgents.setOnAction(event -> {
 			List<Agent> agents = new LinkedList<> ();
-			for(int i=0;i<20;i++)
+			for(int i=0;i<40;i++)
 			{
 				agents.add(new Agent("Agent"+Character.toString((char)(i+65))));
 			}
@@ -382,6 +383,23 @@ public class MainController{
 			eventReactionRepo.save(evReaction);
 		//	eventNameExecutionComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findAll()));
 		});
+		generateGoalExecution.setOnAction(event -> {
+			List<GoalInfo> goalInfos = new LinkedList<>();
+			for(Agent agent: agentRepo.findAll())
+			{
+				for(GoalName goalName: goalNameRepo.findAll())
+				{
+				GoalInfo goalInfo = new GoalInfo();
+				Random r = new Random();
+				double randomValue = r.nextDouble();
+				goalInfo.setWeight(randomValue);
+				goalInfo.setAgent(agent);
+				goalInfo.setGoalName(goalName);
+				goalInfos.add(goalInfo);
+				}
+			}
+			goalInfoRepo.saveAll(goalInfos);
+		});
 		generateEventExecution.setOnAction(event -> {
 			List<EventInfo> listEventInfo = new LinkedList<>();
 			List<EventReaction> listEventReaction = new LinkedList<>();
@@ -405,6 +423,7 @@ public class MainController{
 			eventReactionRepo.saveAll(listEventReaction);
 			
 		});
+		
 		saveAgent.setOnAction(event -> {
 			if (validateAgent()) {
 
