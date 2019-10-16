@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -381,7 +382,29 @@ public class MainController{
 			eventReactionRepo.save(evReaction);
 		//	eventNameExecutionComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findAll()));
 		});
-
+		generateEventExecution.setOnAction(event -> {
+			List<EventInfo> listEventInfo = new LinkedList<>();
+			List<EventReaction> listEventReaction = new LinkedList<>();
+			for(Agent agent : agentNameExecutionEventComboBox.getItems())
+			{
+				for(EventName eventName : eventNameComboBox.getItems())
+				{
+					EventInfo eventInfo = new EventInfo();
+					eventInfo.setAgent(agent);
+					Random r = new Random();
+					double randomValue = r.nextDouble();
+					eventInfo.setEventIntensityLevel(randomValue);
+					eventInfo.setEventName(eventName);
+					listEventInfo.add(eventInfo);
+					EventReaction eventReaction = new EventReaction("event reaction");
+					eventReaction.setEventInfo(eventInfo);
+					listEventReaction.add(eventReaction);
+				}
+			}
+			eventInfoRepo.saveAll(listEventInfo);
+			eventReactionRepo.saveAll(listEventReaction);
+			
+		});
 		saveAgent.setOnAction(event -> {
 			if (validateAgent()) {
 
