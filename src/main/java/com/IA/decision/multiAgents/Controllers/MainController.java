@@ -124,12 +124,12 @@ public class MainController{
 	public Button updateEventExecution;
 	@FXML
 	public Button updateEventName;
-
+		
+	@FXML
+	public Button generateEventExecution;
 
 	@FXML
 	public Button addEventName;
-	@FXML
-	public Button generateEventName;
 	@FXML
 	public Button addEventExecution;
 	// event
@@ -286,15 +286,8 @@ public class MainController{
 				eventName.setGoalName(goalName);
 				eventNames.add(eventName);
 				eventNameRepo.saveAll(eventNames);
-				
+				goalNameComboBox.setItems(FXCollections.observableArrayList(goalNameRepo.findAll()));
 		
-				goalNames.add(new GoalName("Appreciation"));
-				goalNames.add(new GoalName("Social growth"));
-				
-			
-				
-			goalNameComboBox.setItems(FXCollections.observableArrayList(goalNames));
-			goalExecutionComboBox.setItems(FXCollections.observableArrayList(goalNames));
 			
 		});
 		addAction.setOnAction(event -> {
@@ -352,20 +345,18 @@ public class MainController{
 			eventNameComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findAll()));
 			eventNameExecutionComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findAll()));
 		});
-		generateEventName.setOnAction(event -> {
-			List<EventName> eventNames = new LinkedList<>();
-		
-		});
+
 		generateAgents.setOnAction(event -> {
 			List<Agent> agents = new LinkedList<> ();
 			for(int i=0;i<20;i++)
 			{
 				agents.add(new Agent("Agent"+Character.toString((char)(i+65))));
 			}
+			agentRepo.saveAll(agents);
 			agentsComboBox.setItems(FXCollections.observableArrayList(agents));
 			agentSrc.setItems(FXCollections.observableArrayList(agents));
 			agentDest.setItems(FXCollections.observableArrayList(agents));
-			agentRepo.saveAll(agents);
+			
 			});
 		addEventExecution.setOnAction(event -> {
 		
@@ -547,10 +538,9 @@ public class MainController{
 
 			if (newGoal != null) {		
 				goalName.setText(newGoal.getName());
-		}
+				}
+			eventNameComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findByGoalName(newGoal)));
 		});
-		
-		actionComboBox.valueProperty().addListener((ChangeListener<Action>) (ov, oldValue, newAction) -> {});
 
 	}
 	
