@@ -1,9 +1,12 @@
 package com.IA.decision.multiAgents.BO;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 
@@ -40,9 +43,26 @@ public class OCC {
 	{
 		
 	}
+	
 	private double joy;
 	private double distress;
 	private double shame;
+	private double hope;
+	private double fear;
+	private double satisfaction;
+	private double fearConfirmed;
+	private double disappointment;
+	private double relief;
+
+	@OneToMany
+	private List<OCCsTowardsAgent> happyFor;
+	@OneToMany
+	private List<OCCsTowardsAgent> sorryFor;
+	@OneToMany
+	private List<OCCsTowardsAgent> gloating;
+	@OneToMany
+	private List<OCCsTowardsAgent> pity;
+	
 	public double getShame() {
 		return shame;
 	}
@@ -56,5 +76,41 @@ public class OCC {
 	}
 	public void setProud(double proud) {
 		this.proud = proud;
+	}
+	public double getHope() {
+		return hope;
+	}
+	public void setHope(double hope) {
+		this.hope = hope;
+	}
+	public double getFear() {
+		return fear;
+	}
+	public void setFear(double fear) {
+		this.fear = fear;
+	}
+	public double getSatisfaction() {
+		return satisfaction;
+	}
+	public void setSatisfaction(double satisfaction) {
+		this.satisfaction = satisfaction;
+	}
+	public double getFearConfirmed() {
+		return fearConfirmed;
+	}
+	public void setFearConfirmed(double fearConfirmed) {
+		this.fearConfirmed = fearConfirmed;
+	}
+	public double getDisappointment() {
+		return disappointment;
+	}
+	public void setDisappointment(double disappointment) {
+		this.disappointment = disappointment;
+	}
+	public double getRelief() {
+		return relief;
+	}
+	public void setRelief(double relief) {
+		this.relief = relief;
 	}
 }

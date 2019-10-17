@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.IA.decision.multiAgents.BO.Action;
 import com.IA.decision.multiAgents.BO.Agent;
 import com.IA.decision.multiAgents.BO.EventInfo;
+import com.IA.decision.multiAgents.BO.OCC;
 import com.IA.decision.multiAgents.BO.EventName;
 import com.IA.decision.multiAgents.BO.EventReaction;
 import com.IA.decision.multiAgents.BO.GoalName;
@@ -221,20 +223,7 @@ public class MainController{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			  
-					//goAgents();
-//	    				Agent agent = new Agent("sami");
-//	    				
-//	    				Goal goal = new Goal("succeed the exam", 0.5);
-//	    				goal.setAgent(agent);
-//	    				
-//	    				EventName ev = new EventName("Exams will be difficult",false,false,0.3);
-//
-//	    				ev.setGoal(goal);
-//	    				
-//	    				agentRepo.save(agent);
-//	    				goalRepo.save(goal);
-//	    				eventRepo.save(ev);	  
+
 		});
 
 		addGoalExecution.setOnAction(event -> {
@@ -350,10 +339,28 @@ public class MainController{
 
 		generateAgents.setOnAction(event -> {
 			List<Agent> agents = new LinkedList<> ();
+			List<OCEAN> occeans = new LinkedList<>();
 			for(int i=0;i<40;i++)
 			{
-				agents.add(new Agent("Agent"+Character.toString((char)(i+65))));
+				Agent agent = new Agent("Agent"+Character.toString((char)(i+65)));
+				agents.add(agent);
+				OCEAN ocean = new OCEAN();
+				ocean.setAgent(agent);
+				Random r = new Random();
+				Double agreeableness =  r.nextDouble();
+				ocean.setAgreeableness(agreeableness);
+				Double conscientiousness = r.nextDouble();
+				ocean.setConscientiousness(conscientiousness);
+				Double openness = r.nextDouble(); 
+				ocean.setOpenness(openness);
+				Double extraversion = r.nextDouble(); 
+				ocean.setExtraversion(extraversion);
+				Double neuroticism = r.nextDouble(); 
+				ocean.setNeuroticism(neuroticism);
+				occeans.add(ocean);
+				
 			}
+			OCEANRepo.saveAll(occeans);
 			agentRepo.saveAll(agents);
 			agentsComboBox.setItems(FXCollections.observableArrayList(agents));
 			agentSrc.setItems(FXCollections.observableArrayList(agents));
@@ -469,13 +476,17 @@ public class MainController{
 
 			if (newAgent != null) {
 				OCEAN oceanByAgent = OCEANRepo.findByAgent(newAgent);
+				Optional<OCC> occByAgentOpt = OCCRepo.findByAgent(newAgent);
+				if (occByAgentOpt.isPresent())
+				{
+					OCC occByAgent = occByAgentOpt.get();
+					
+				}
 				openness.setText(oceanByAgent.getOpenness().toString());
 				conscientiousness.setText(oceanByAgent.getConscientiousness().toString());
 				extraversion.setText(oceanByAgent.getExtraversion().toString());
 				agreeableness.setText(oceanByAgent.getAgreeableness().toString());
-				neuroticism.setText(oceanByAgent.getNeuroticism().toString());
-	
-			
+				neuroticism.setText(oceanByAgent.getNeuroticism().toString());		
 			}
 		});
 		actionComboBox.valueProperty().addListener((ChangeListener<Action>) (ov, oldValue, newAction) -> {
@@ -487,8 +498,6 @@ public class MainController{
 				actionMessage.setText(newAction.getMessage());
 				reqCheckbox.setSelected(newAction.getRequestOrResponse());
 				actionApprDegLvl.setText(newAction.getApprovalDegreeLevel().toString());
-
-		
 			}
 		});
 		goalExecutionComboBox.valueProperty().addListener((ChangeListener<GoalName>) (ov, oldValue, newGoal) -> {
@@ -525,8 +534,7 @@ public class MainController{
 						goalWeight.setText("");
 					}
 				}
-			}
-			
+			}		
 		});
 		eventNameComboBox.valueProperty().addListener((ChangeListener<EventName>) (ov, oldValue, newEvent) -> {
 			if (newEvent != null) {
