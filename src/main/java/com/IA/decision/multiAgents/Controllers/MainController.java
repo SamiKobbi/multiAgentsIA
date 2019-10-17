@@ -242,7 +242,8 @@ public class MainController{
 			goalInfoRepo.save(goalWght);
 		});
 		generateGoal.setOnAction(event -> {
-				
+				eventNameRepo.deleteAll();
+				goalNameRepo.deleteAll();
 				GoalName goalName = new GoalName("Success the exam");
 				goalNameRepo.save(goalName);
 
@@ -360,8 +361,12 @@ public class MainController{
 				occeans.add(ocean);
 				
 			}
-			OCEANRepo.saveAll(occeans);
+			OCEANRepo.deleteAll();
+			agentRepo.deleteAll();
+			
 			agentRepo.saveAll(agents);
+			OCEANRepo.saveAll(occeans);
+		
 			agentsComboBox.setItems(FXCollections.observableArrayList(agents));
 			agentSrc.setItems(FXCollections.observableArrayList(agents));
 			agentDest.setItems(FXCollections.observableArrayList(agents));
@@ -405,6 +410,7 @@ public class MainController{
 				goalInfos.add(goalInfo);
 				}
 			}
+			goalInfoRepo.deleteAll();
 			goalInfoRepo.saveAll(goalInfos);
 		});
 		generateEventExecution.setOnAction(event -> {
@@ -426,6 +432,9 @@ public class MainController{
 					listEventReaction.add(eventReaction);
 				}
 			}
+			eventReactionRepo.deleteAll();
+			eventInfoRepo.deleteAll();
+			
 			eventInfoRepo.saveAll(listEventInfo);
 			eventReactionRepo.saveAll(listEventReaction);
 			

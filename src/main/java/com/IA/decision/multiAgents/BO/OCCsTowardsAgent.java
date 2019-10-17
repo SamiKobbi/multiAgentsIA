@@ -17,20 +17,21 @@ private Long id;
 
 private double OCCValue;
 @OneToOne
-private Agent agent;
+private Agent agentDest;
 
+public Agent getAgentDest() {
+	return agentDest;
+}
+public void setAgentDest(Agent agentDest) {
+	this.agentDest = agentDest;
+}
 public double getOCCValue() {
 	return OCCValue;
 }
 public void setOCCValue(double OCCValue) {
 	this.OCCValue = OCCValue;
 }
-public Agent getAgent() {
-	return agent;
-}
-public void setAgent(Agent agent) {
-	this.agent = agent;
-}
+
 
 
 }

@@ -54,6 +54,31 @@ public class OCC {
 	private double disappointment;
 	private double relief;
 
+	public List<OCCsTowardsAgent> getHappyFor() {
+		return happyFor;
+	}
+	public void setHappyFor(List<OCCsTowardsAgent> happyFor) {
+		this.happyFor = happyFor;
+	}
+	public List<OCCsTowardsAgent> getSorryFor() {
+		return sorryFor;
+	}
+	public void setSorryFor(List<OCCsTowardsAgent> sorryFor) {
+		this.sorryFor = sorryFor;
+	}
+	public List<OCCsTowardsAgent> getGloating() {
+		return gloating;
+	}
+	public void setGloating(List<OCCsTowardsAgent> gloating) {
+		this.gloating = gloating;
+	}
+	public List<OCCsTowardsAgent> getPity() {
+		return pity;
+	}
+	public void setPity(List<OCCsTowardsAgent> pity) {
+		this.pity = pity;
+	}
+
 	@OneToMany
 	private List<OCCsTowardsAgent> happyFor;
 	@OneToMany
