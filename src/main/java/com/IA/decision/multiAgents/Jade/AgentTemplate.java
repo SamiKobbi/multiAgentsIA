@@ -113,58 +113,113 @@ public class AgentTemplate extends Agent {
 		/**
 		 * 
 		 */
-		private void updateOCCVector(Optional<OCC> optocc, Optional<com.IA.decision.multiAgents.BO.Agent> agent, Double desirablity, Boolean eventDegree)
+		public double addNewOCCValue(double oldOCCValue, double occUpdate)
+		{
+			double newOCCValue;
+			if(occUpdate + oldOCCValue > 1)
+			{
+				newOCCValue = 1;
+			}
+			else
+			{
+				newOCCValue = oldOCCValue + occUpdate;
+			}
+			return newOCCValue;
+		
+		}
+		
+		public double subNewOCCValue(double oldOCCValue, double occUpdate)
+		{
+			double newOCCValue;
+			newOCCValue = Math.abs(oldOCCValue - occUpdate);
+			if(newOCCValue < oldOCCValue)
+			{
+				return newOCCValue;
+			}
+			return oldOCCValue;
+		}
+		
+		private void updateOCCVector(String emotionType, Optional<OCC> optocc, Optional<com.IA.decision.multiAgents.BO.Agent> agent, Double occUpdate, Boolean eventDegree)
 		{
 			OCC occ;
-			logger.info("Updating OCC agent: "+ agent.get().getName()+" desirablity: "+desirablity+" event degree : "+eventDegree);
-			if (optocc.isPresent()) {
-				occ = optocc.get();
-				Double distress, joy;
-				if (eventDegree) {
-					
-					if(desirablity + occ.getJoy() > 1)
-					{
-						occ.setJoy(1);
-					}
-					else
-					{
-						occ.setJoy(desirablity + occ.getJoy());
-					}
-					distress = Math.abs(occ.getDistress()-desirablity);
-					if(distress < occ.getDistress())
-					{
-						occ.setDistress(distress);
-					}
-				
-				}
-				else
-				{
-					if(desirablity + occ.getDistress() > 1)
-					{
-						occ.setDistress(1);
-					}
-					else
-					{
-						occ.setDistress(desirablity + occ.getDistress());
-					}
-					joy = Math.abs(occ.getJoy()- desirablity);
-					if(joy < occ.getJoy())
-					{
-						occ.setJoy(joy);
-					}
-					
-				}
-			} else {
-				
+			Double newNegOCC,oldNegOCC, newPosOCC, oldPosOCC;
+			logger.info("Updating OCC agent: "+ agent.get().getName()+" occUpdate: "+occUpdate+" event degree : "+eventDegree);
+			if (!optocc.isPresent()) {
 				occ = new OCC();
 				if (eventDegree) {
-					occ.setJoy(desirablity);		
+					newPosOCC = occUpdate;
 				}
 				else
 				{
-				occ.setDistress(desirablity);
+					newNegOCC = occUpdate;
 				}
+				
 			}
+			else {
+				occ = optocc.get();
+				if(emotionType.equals("joy/distress"))
+				{
+					if(eventDegree)
+					{
+						newPosOCC = addNewOCCValue(occ.getJoy(), occUpdate);
+						newNegOCC = subNewOCCValue(occ.getDistress(), occUpdate);
+					}
+					else
+					{
+						newPosOCC = subNewOCCValue(occ.getJoy(), occUpdate);
+						newNegOCC = addNewOCCValue(occ.getDistress(), occUpdate);
+					}
+					
+					
+				}
+				else if(emotionType.equals("hope/fear"))
+				{
+					if(eventDegree)
+					{
+						newPosOCC = addNewOCCValue(occ.getHope(), occUpdate);
+						newNegOCC = subNewOCCValue(occ.getFear(), occUpdate);
+					}
+					else
+					{
+						newPosOCC = subNewOCCValue(occ.getHope(), occUpdate);
+						newNegOCC = addNewOCCValue(occ.getFear(), occUpdate);
+					}
+
+				}
+				else if(emotionType.equals("satisfaction/fear confirmed"))
+				{
+					if(eventDegree)
+					{
+						newPosOCC = addNewOCCValue(occ.getSatisfaction(), occUpdate);
+						newNegOCC = subNewOCCValue(occ.getFearConfirmed(), occUpdate);
+					}
+					else
+					{
+						newPosOCC = subNewOCCValue(occ.getSatisfaction(), occUpdate);
+						newNegOCC = addNewOCCValue(occ.getFearConfirmed(), occUpdate);
+					}
+					
+				}
+				else if(emotionType.equals("relief/disappointment"))
+				{
+					if(eventDegree)
+					{
+						newPosOCC = addNewOCCValue(occ.getRelief(), occUpdate);
+						newNegOCC = subNewOCCValue(occ.getDisappointment() , occUpdate);
+					}
+					else
+					{
+						newPosOCC = subNewOCCValue(occ.getRelief() , occUpdate);
+						newNegOCC = addNewOCCValue(occ.getDisappointment(), occUpdate);
+					}
+					
+				}
+				
+			}
+			
+			
+			
+			 
 			occ.setAgent(agent.get());
 			OCCRepo.save(occ);
 		}
@@ -209,8 +264,10 @@ public class AgentTemplate extends Agent {
 					Optional<OCC> optocc = OCCRepo.findByAgent(agent.get());
 					Double desirability = eventInfo.getEventIntensityLevel() * goalInfo.getWeight();
 					
-					updateOCCVector(optocc, agent , desirability , eventName.get().getEventDegree());
-					
+					updateOCCVector("joy/distress", optocc, agent , desirability , eventName.get().getEventDegree());
+					updateOCCVector("hope/fear", optocc, agent , desirability , eventName.get().getEventDegree());
+					updateOCCVector("satisfaction/fear confirmed", optocc, agent , desirability , eventName.get().getEventDegree());
+					updateOCCVector("relief/disappointment", optocc, agent , desirability , eventName.get().getEventDegree());
 					EventReaction eventReaction = eventReactionRepo.findByEventInfo(eventInfo);
 					ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
 					msg3.setContent("eventReaction:" + eventReaction.getId());
@@ -247,7 +304,7 @@ public class AgentTemplate extends Agent {
 					//it is a variable storing the value returned from the formula updating the occ vector
 					//praise worthy = action approval level * degree 
 					//proud should be equal to that value
-					updateOCCVector(optocc, agent , action.get().getApprovalDegreeLevel() , action.get().getActionDegree());
+					updateOCCVector("joy/distress",optocc, agent , action.get().getApprovalDegreeLevel() , action.get().getActionDegree());
 					p++;
 				}
 			}
