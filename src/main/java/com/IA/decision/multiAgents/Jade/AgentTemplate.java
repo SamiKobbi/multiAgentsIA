@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -16,7 +17,9 @@ import com.IA.decision.multiAgents.BO.EventInfo;
 import com.IA.decision.multiAgents.BO.EventName;
 import com.IA.decision.multiAgents.BO.EventReaction;
 import com.IA.decision.multiAgents.BO.GoalInfo;
+import com.IA.decision.multiAgents.BO.LikingTowardsAgent;
 import com.IA.decision.multiAgents.BO.OCC;
+import com.IA.decision.multiAgents.BO.OCCsTowardsAgent;
 import com.IA.decision.multiAgents.config.ApplicationContextProvider;
 import com.IA.decision.multiAgents.repositories.ActionRepository;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
@@ -142,7 +145,7 @@ public class AgentTemplate extends Agent {
 		private void updateOCCVector(String emotionType, Optional<OCC> optocc, Optional<com.IA.decision.multiAgents.BO.Agent> agent, Double occUpdate, Boolean eventDegree)
 		{
 			OCC occ;
-			Double newNegOCC,oldNegOCC, newPosOCC, oldPosOCC;
+			double newNegOCC = 0, newPosOCC = 0;
 			logger.info("Updating OCC agent: "+ agent.get().getName()+" occUpdate: "+occUpdate+" event degree : "+eventDegree);
 			if (!optocc.isPresent()) {
 				occ = new OCC();
@@ -190,13 +193,13 @@ public class AgentTemplate extends Agent {
 				{
 					if(eventDegree)
 					{
-						newPosOCC = addNewOCCValue(occ.getSatisfaction(), occUpdate);
-						newNegOCC = subNewOCCValue(occ.getFearConfirmed(), occUpdate);
+						newPosOCC = occ.getHope();
+						newNegOCC = 0;
 					}
 					else
 					{
-						newPosOCC = subNewOCCValue(occ.getSatisfaction(), occUpdate);
-						newNegOCC = addNewOCCValue(occ.getFearConfirmed(), occUpdate);
+						newPosOCC = 0;
+						newNegOCC = occ.getFear();
 					}
 					
 				}
@@ -204,22 +207,39 @@ public class AgentTemplate extends Agent {
 				{
 					if(eventDegree)
 					{
-						newPosOCC = addNewOCCValue(occ.getRelief(), occUpdate);
-						newNegOCC = subNewOCCValue(occ.getDisappointment() , occUpdate);
+						newPosOCC = 0;
+						newNegOCC = occ.getHope();
 					}
 					else
 					{
-						newPosOCC = subNewOCCValue(occ.getRelief() , occUpdate);
-						newNegOCC = addNewOCCValue(occ.getDisappointment(), occUpdate);
+						newPosOCC = occ.getFear();
+						newNegOCC = 0;
 					}
 					
 				}
 				
 			}
-			
-			
-			
-			 
+			if(emotionType.equals("joy/distress"))
+			{
+				occ.setJoy(newPosOCC);
+				occ.setDistress(newNegOCC);
+				
+			}
+			else if(emotionType.equals("hope/fear") )
+			{
+				occ.setHope(newPosOCC);
+				occ.setFear(newNegOCC);
+			}
+			else if(emotionType.equals("satisfaction/fear confirmed") )
+			{
+				occ.setSatisfaction(newPosOCC);
+				occ.setFearConfirmed(newNegOCC);
+			}
+			else if(emotionType.equals("relief/disappointment") )
+			{
+				occ.setRelief(newPosOCC);
+				occ.setDisappointment(newNegOCC);
+			}		 
 			occ.setAgent(agent.get());
 			OCCRepo.save(occ);
 		}
@@ -257,17 +277,74 @@ public class AgentTemplate extends Agent {
 					Optional<EventName> eventName = eventNameRepo.findById(Long.parseLong((message.split(":"))[1]));
 					GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(agentId,eventName.get().getGoalName().getId()
 							);
+					//update occ values for the agent related to himself
 					EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent( agentId, eventName.get().getId());
+					
 					if(eventInfo != null)
 					{
 
 					Optional<OCC> optocc = OCCRepo.findByAgent(agent.get());
 					Double desirability = eventInfo.getEventIntensityLevel() * goalInfo.getWeight();
+					if(eventName.get().getProspected())
+					{
+						updateOCCVector("hope/fear", optocc, agent , eventName.get().getLikelihood()*0.25*desirability , eventName.get().getEventDegree());	
+						
+					}
+					else
+					{
+						if(eventName.get().getConfirmed())
+						{
+							
+						updateOCCVector("joy/distress", optocc, agent , desirability , eventName.get().getEventDegree());
+							
+						updateOCCVector("satisfaction/fear confirmed", optocc, agent , desirability , eventName.get().getEventDegree());
+						}
+						else {
+						updateOCCVector("disappointment/relief", optocc, agent , desirability , eventName.get().getEventDegree());
+							
+								
+						}
+					}
+					//update occ values for the agent related to himself
+					//update occ values for other
+					List<OCCsTowardsAgent> happyForList = new LinkedList<>();
+					List<OCCsTowardsAgent> sorryForList = new LinkedList<>();
+					List<OCCsTowardsAgent> gloatingList = new LinkedList<>();
+					List<OCCsTowardsAgent> pityList = new LinkedList<>();
+					for(LikingTowardsAgent likingTowardAgent: agent.get().getLikingTowardAgent())
+					{
+						if(eventName.get().getEventDegree())
+						{
+						OCCsTowardsAgent happyFor = new OCCsTowardsAgent();
+						happyFor.setAgentDest(agent.get());
+						happyFor.setOCCValue(desirability*likingTowardAgent.getLikingValue());
+						happyForList.add(happyFor);
+						}
+						else
+						{
+							OCCsTowardsAgent sorryFor = new OCCsTowardsAgent();
+							sorryFor.setAgentDest(agent.get());
+							sorryFor.setOCCValue(desirability*likingTowardAgent.getLikingValue());
+							sorryForList.add(sorryFor);
+							if(likingTowardAgent.getLikingValue()==0)
+							{
+								OCCsTowardsAgent gloating = new OCCsTowardsAgent();
+								gloating.setAgentDest(agent.get());
+								gloatingList.add(gloating);
+							}
+							else
+							{
+								OCCsTowardsAgent pity = new OCCsTowardsAgent();
+								pity.setAgentDest(agent.get());
+								pityList.add(pity);
+							}
+						}
+					}
 					
-					updateOCCVector("joy/distress", optocc, agent , desirability , eventName.get().getEventDegree());
-					updateOCCVector("hope/fear", optocc, agent , desirability , eventName.get().getEventDegree());
-					updateOCCVector("satisfaction/fear confirmed", optocc, agent , desirability , eventName.get().getEventDegree());
-					updateOCCVector("relief/disappointment", optocc, agent , desirability , eventName.get().getEventDegree());
+					
+					
+				
+					//update occ values for other
 					EventReaction eventReaction = eventReactionRepo.findByEventInfo(eventInfo);
 					ACLMessage msg3 = new ACLMessage(ACLMessage.INFORM);
 					msg3.setContent("eventReaction:" + eventReaction.getId());

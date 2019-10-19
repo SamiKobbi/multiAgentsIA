@@ -43,12 +43,7 @@ public class Action {
 	public void setApprovalDegreeLevel(Double approvalDegreeLevel) {
 		this.approvalDegreeLevel = approvalDegreeLevel;
 	}
-	public GoalName getGoal() {
-		return goal;
-	}
-	public void setGoal(GoalName goal) {
-		this.goal = goal;
-	}
+
 	public Agent getAgentSrc() {
 		return agentSrc;
 	}
@@ -76,7 +71,14 @@ public class Action {
 	private Boolean requestOrResponse;
 	private Double approvalDegreeLevel;
 	@ManyToOne
-	private GoalName goal;
+	private EventReaction eventReaction;
+
+	public EventReaction getEventReaction() {
+		return eventReaction;
+	}
+	public void setEventReaction(EventReaction eventReaction) {
+		this.eventReaction = eventReaction;
+	}
 	@OneToOne
 	private Agent agentSrc;
 	@OneToOne

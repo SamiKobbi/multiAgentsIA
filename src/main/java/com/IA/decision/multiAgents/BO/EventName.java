@@ -12,12 +12,19 @@ public class EventName {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
+	public Boolean prospected;
+	public Boolean getProspected() {
+		return prospected;
+	}
+
+	public void setProspected(Boolean prospected) {
+		this.prospected = prospected;
+	}
 	private Boolean eventDegree;
 	public Boolean getEventDegree() {
 		return eventDegree;
 	}
-
+	private int likelihood;
 	public void setEventDegree(Boolean eventDegree) {
 		this.eventDegree = eventDegree;
 	}
@@ -69,6 +76,14 @@ public class EventName {
 	public EventName()
 	{
 		
+	}
+
+	public int getLikelihood() {
+		return likelihood;
+	}
+
+	public void setLikelihood(int likelihood) {
+		this.likelihood = likelihood;
 	}
 	
 }

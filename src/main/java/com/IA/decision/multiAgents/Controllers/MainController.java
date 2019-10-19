@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,25 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
-import com.IA.decision.multiAgents.BO.Action;
-import com.IA.decision.multiAgents.BO.Agent;
-import com.IA.decision.multiAgents.BO.EventInfo;
-import com.IA.decision.multiAgents.BO.OCC;
-import com.IA.decision.multiAgents.BO.EventName;
-import com.IA.decision.multiAgents.BO.EventReaction;
-import com.IA.decision.multiAgents.BO.GoalName;
-import com.IA.decision.multiAgents.BO.GoalInfo;
-import com.IA.decision.multiAgents.BO.OCEAN;
-
-import com.IA.decision.multiAgents.repositories.ActionRepository;
-import com.IA.decision.multiAgents.repositories.AgentRepository;
-import com.IA.decision.multiAgents.repositories.EventInfoRepository;
-import com.IA.decision.multiAgents.repositories.EventReactionRepository;
-import com.IA.decision.multiAgents.repositories.EventNameRepository;
-import com.IA.decision.multiAgents.repositories.GoalInfoRepository;
-import com.IA.decision.multiAgents.repositories.GoalNameRepository;
-import com.IA.decision.multiAgents.repositories.OCCRepository;
-import com.IA.decision.multiAgents.repositories.OCEANRepository;
+import com.IA.decision.multiAgents.BO.*;
+import com.IA.decision.multiAgents.repositories.*;
 
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -158,6 +142,8 @@ public class MainController{
 	public Button updateAction;
 	@FXML
 	public Button addAction;
+	@FXML
+	public Button generateAction;
 	// Action
 	// reports
 	@FXML
@@ -165,6 +151,8 @@ public class MainController{
 	// reports
 	@Autowired
 	private EventNameRepository eventNameRepo;
+	@Autowired
+	private LikingTowardsAgentRepository likingTowardsAgentRepo;
 	@Autowired
 	private EventInfoRepository eventInfoRepo;
 	@Autowired
@@ -209,6 +197,165 @@ public class MainController{
 		actionComboBox.setItems(FXCollections.observableArrayList(actionRepo.findAll()));
 		goalNameComboBox.getSelectionModel().selectFirst();
 
+		
+		generateEventExecution.setOnAction(event -> {
+			List<EventInfo> listEventInfo = new LinkedList<>();
+			List<EventReaction> listEventReaction = new LinkedList<>();
+			List<EventReaction> listPositiveReaction = new LinkedList<>();
+			listPositiveReaction.add(new EventReaction("Asking for help"));
+			listPositiveReaction.add(new EventReaction("High effort"));
+			
+			List<EventReaction> listNegativeReaction = new LinkedList<>();
+			listNegativeReaction.add(new EventReaction("Asking for help"));
+			listNegativeReaction.add(new EventReaction("Giving up"));
+			for(Agent agent : agentNameExecutionEventComboBox.getItems())
+			{
+				for(EventName eventName : eventNameComboBox.getItems())
+				{
+
+					EventInfo eventInfo = new EventInfo();
+					eventInfo.setAgent(agent);
+					double randomValue = Math.round(ThreadLocalRandom.current().nextDouble(0,1)* 100d) / 100d;
+					eventInfo.setEventIntensityLevel(randomValue);
+					eventInfo.setEventName(eventName);
+					listEventInfo.add(eventInfo);
+					EventReaction eventReaction = new EventReaction();
+					if(eventName.getGoalName().getName().equals("Success the exam")||eventName.getGoalName().getName().equals("Success the year"))
+					{
+						
+						if(eventName.getEventDegree())
+						{
+							eventReaction.setEventReaction("Keep working");
+						}
+						else
+						{
+							if(OCEANRepo.findByAgent(agent).getConscientiousness()>=0.5)
+							{
+								
+									eventReaction.setEventReaction("High effort");
+								
+							}
+							else
+							{
+								
+								eventReaction.setEventReaction("Asking for help");
+							}
+						}
+					}
+						eventReaction.setEventInfo(eventInfo);
+						listEventReaction.add(eventReaction);
+					}
+
+				
+			}
+			eventReactionRepo.deleteAll();
+			eventInfoRepo.deleteAll();
+			
+			eventInfoRepo.saveAll(listEventInfo);
+			eventReactionRepo.saveAll(listEventReaction);
+			
+		});
+		generateAction.setOnAction(event -> {
+			actionRepo.deleteAll();
+			List<Action> actions = new LinkedList<>();
+			List<EventReaction> eventReactions = eventReactionRepo.findAll();
+			double approvalDegreeLevel=0;
+			for(EventReaction eventReaction : eventReactions)
+			{
+				if(eventReaction.getReactionName().equals("Asking for help"))
+				{
+					Agent agentDest = eventReaction.getEventInfo().getAgent(); 
+					for(Agent agentSrc: agentRepo.findAll())
+					{
+						if(agentSrc!=agentDest)
+						{
+						Action action = new Action();
+						OCEAN oceanAgent = OCEANRepo.findByAgent(agentSrc); 
+						if(oceanAgent.getAgreeableness()>=0.5)
+						{
+							approvalDegreeLevel = Math.round(ThreadLocalRandom.current().nextDouble(0.5 , 1)* 100d) / 100d;
+							action.setMessage("Accepting help");
+							action.setActionDegree(true);
+						}
+						else
+						{
+							approvalDegreeLevel = Math.round(ThreadLocalRandom.current().nextDouble(0 ,0.5 )* 100d) / 100d;
+							action.setMessage("Rejecting help");
+							action.setActionDegree(false);
+						}
+						action.setApprovalDegreeLevel(approvalDegreeLevel);
+						action.setAgentSrc(agentSrc);
+						action.setAgentDest(agentDest);
+						actions.add(action);
+						}
+					}
+				}
+			}
+			actionRepo.saveAll(actions);
+		});
+		generateGoalExecution.setOnAction(event -> {
+			List<GoalInfo> goalInfos = new LinkedList<>();
+			for(Agent agent: agentRepo.findAll())
+			{
+				for(GoalName goalName: goalNameRepo.findAll())
+				{
+				GoalInfo goalInfo = new GoalInfo();
+				//goal weight
+				double randomValue = Math.round(ThreadLocalRandom.current().nextDouble(0,1)* 100d) / 100d;
+				goalInfo.setWeight(randomValue);
+				goalInfo.setAgent(agent);
+				goalInfo.setGoalName(goalName);
+				goalInfos.add(goalInfo);
+				}
+			}
+			goalInfoRepo.deleteAll();
+			goalInfoRepo.saveAll(goalInfos);
+		});
+		
+		generateGoal.setOnAction(event -> {
+			eventNameRepo.deleteAll();
+			goalNameRepo.deleteAll();
+			GoalName goalName = new GoalName("Success the exam");
+			goalNameRepo.save(goalName);
+
+			List<EventName> eventNames = new LinkedList<>();				
+			EventName eventName = new EventName("Bad mark",true,false);
+			eventName.setGoalName(goalName);
+			eventNames.add(eventName);
+			eventName = new EventName("Prospect bad mark", false, false);
+			eventName.setGoalName(goalName);
+			eventNames.add(eventName);
+			eventName = new EventName("Good mark", true, true);
+			eventName.setGoalName(goalName);
+			eventNames.add(eventName);
+			eventName = new EventName("Prospect good mark", true, true);
+			eventName.setGoalName(goalName);
+			eventNames.add(eventName);
+			eventNameRepo.saveAll(eventNames);
+			
+			goalName = new GoalName("Success the year");
+			goalNameRepo.save(goalName);
+			eventNames.clear();				
+			eventName = new EventName("Failing the activities",true,false);
+			eventName.setGoalName(goalName);
+			eventNames.add(eventName);
+			eventName = new EventName("Prospect failing the activities", false, false);
+			eventName.setGoalName(goalName);
+			eventNames.add(eventName);
+			eventName = new EventName("Have success the activities", true, true);
+			eventName.setGoalName(goalName);
+			eventNames.add(eventName);
+			eventName = new EventName("Prospect success the activities", false, true);
+			eventName.setGoalName(goalName);
+			eventNames.add(eventName);
+			eventNameRepo.saveAll(eventNames);
+			goalNameComboBox.setItems(FXCollections.observableArrayList(goalNameRepo.findAll()));
+			eventNameComboBox.setItems(FXCollections.observableArrayList(eventNames));
+			goalExecutionComboBox.setItems(FXCollections.observableArrayList(goalNameRepo.findAll()));
+			eventNameExecutionComboBox.setItems(FXCollections.observableArrayList(eventNames));
+	
+		
+		});
 		goButton.setOnAction(event -> {
 			 
 			
@@ -241,53 +388,12 @@ public class MainController{
 			goalWght.setWeight(Double.parseDouble(goalWeight.getText()));
 			goalInfoRepo.save(goalWght);
 		});
-		generateGoal.setOnAction(event -> {
-				eventNameRepo.deleteAll();
-				goalNameRepo.deleteAll();
-				GoalName goalName = new GoalName("Success the exam");
-				goalNameRepo.save(goalName);
 
-				List<EventName> eventNames = new LinkedList<>();				
-				EventName eventName = new EventName("Bad mark",true,false);
-				eventName.setGoalName(goalName);
-				eventNames.add(eventName);
-				eventName = new EventName("Prospect bad mark", false, false);
-				eventName.setGoalName(goalName);
-				eventNames.add(eventName);
-				eventName = new EventName("Good mark", true, true);
-				eventName.setGoalName(goalName);
-				eventNames.add(eventName);
-				eventName = new EventName("Prospect good mark", true, true);
-				eventName.setGoalName(goalName);
-				eventNames.add(eventName);
-				eventNameRepo.saveAll(eventNames);
-				
-				goalName = new GoalName("Success the year");
-				goalNameRepo.save(goalName);
-				eventNames.clear();				
-				eventName = new EventName("Failing the activities",true,false);
-				eventName.setGoalName(goalName);
-				eventNames.add(eventName);
-				eventName = new EventName("Prospect failing the activities", false, false);
-				eventName.setGoalName(goalName);
-				eventNames.add(eventName);
-				eventName = new EventName("Have success the activities", true, true);
-				eventName.setGoalName(goalName);
-				eventNames.add(eventName);
-				eventName = new EventName("Prospect success the activities", false, true);
-				eventName.setGoalName(goalName);
-				eventNames.add(eventName);
-				eventNameRepo.saveAll(eventNames);
-				goalNameComboBox.setItems(FXCollections.observableArrayList(goalNameRepo.findAll()));
-		
-			
-		});
 		addAction.setOnAction(event -> {
 			Action action = new Action(actionMessage.getText(), actionDeg.isSelected(), reqCheckbox.isSelected(), Double.parseDouble(actionApprDegLvl.getText()));
 			action.setAgentSrc(agentSrc.getSelectionModel().getSelectedItem());
 			action.setAgentDest(agentDest.getSelectionModel().getSelectedItem());
-			action.setGoal(goalNameComboBox.getSelectionModel().getSelectedItem());
-		
+			//action.setEventName(eventNameComboBox.getSelectionModel().getSelectedItem());
 			actionComboBox.getItems().add(action);
 			actionRepo.saveAll(actionComboBox.getItems());
 			clearSelectionAction();
@@ -341,39 +447,80 @@ public class MainController{
 		generateAgents.setOnAction(event -> {
 			List<Agent> agents = new LinkedList<> ();
 			List<OCEAN> occeans = new LinkedList<>();
+			//génération automatique de N(N=40)  agents 
 			for(int i=0;i<40;i++)
 			{
+				//Agent + codeAsci à un charactere
 				Agent agent = new Agent("Agent"+Character.toString((char)(i+65)));
 				agents.add(agent);
+				//initialisation de OCEAN
 				OCEAN ocean = new OCEAN();
 				ocean.setAgent(agent);
-				Random r = new Random();
-				Double agreeableness =  r.nextDouble();
+				
+				Double agreeableness = Math.round(ThreadLocalRandom.current().nextDouble(0,1)* 100d) / 100d;
 				ocean.setAgreeableness(agreeableness);
-				Double conscientiousness = r.nextDouble();
+				Double conscientiousness = Math.round(ThreadLocalRandom.current().nextDouble(0,1)* 100d) / 100d;
 				ocean.setConscientiousness(conscientiousness);
-				Double openness = r.nextDouble(); 
+				Double openness = Math.round(ThreadLocalRandom.current().nextDouble(0,1)* 100d) / 100d;
 				ocean.setOpenness(openness);
-				Double extraversion = r.nextDouble(); 
+				Double extraversion = Math.round(ThreadLocalRandom.current().nextDouble(0,1)* 100d) / 100d;
 				ocean.setExtraversion(extraversion);
-				Double neuroticism = r.nextDouble(); 
+				Double neuroticism = Math.round(ThreadLocalRandom.current().nextDouble(0,1)* 100d) / 100d;
 				ocean.setNeuroticism(neuroticism);
 				occeans.add(ocean);
 				
 			}
+			//Initialisation de Liking Towards Agent  
+			LinkedList<LikingTowardsAgent> likingTowardsAgentList = new LinkedList<>();
+			for(Agent agentSrc: agents)
+			{
+				//récuperation de AgentSrc
+				likingTowardsAgentList.clear();
+				for(Agent agentDest: agents)
+				{
+					//récuperation de AgentDest
+					if(agentSrc != agentDest)
+					{
+						LikingTowardsAgent likingTowardsAgent = new LikingTowardsAgent();
+						OCEAN ocean = OCEANRepo.findByAgent(agentSrc);
+						 double likingValue=0;
+						if(ocean.getAgreeableness()>=0.5 || ocean.getExtraversion()>=0.5)
+						{
+						 likingValue = Math.round(ThreadLocalRandom.current().nextDouble(0.5,1)* 100d) / 100d;
+						}
+						else
+						{
+							 likingValue = Math.round(ThreadLocalRandom.current().nextDouble(0,0.5)* 100d) / 100d;
+						}
+						 likingTowardsAgent.setLikingValue(likingValue);
+						likingTowardsAgent.setAgentDest(agentDest);
+						likingTowardsAgentList.add(likingTowardsAgent);
+					}
+				}
+				agentSrc.setLikingTowardAgent(likingTowardsAgentList);
+			}
+			//suppression de valeurs anciennes
 			OCEANRepo.deleteAll();
 			agentRepo.deleteAll();
-			
+			likingTowardsAgentRepo.deleteAll();
+			//insertion de nouvelles valeurs
 			agentRepo.saveAll(agents);
 			OCEANRepo.saveAll(occeans);
-		
+			likingTowardsAgentRepo.saveAll(likingTowardsAgentList);
+			//mise à jour de la partie graphique
+			//Agents
 			agentsComboBox.setItems(FXCollections.observableArrayList(agents));
+			//Action
 			agentSrc.setItems(FXCollections.observableArrayList(agents));
 			agentDest.setItems(FXCollections.observableArrayList(agents));
-			
+			//Event
+			agentNameExecutionEventComboBox.setItems(FXCollections.observableArrayList(agents));
+			//Goal
+			agentsGoalExecution.setItems(FXCollections.observableArrayList(agents));			
 			});
-		addEventExecution.setOnAction(event -> {
 		
+		addEventExecution.setOnAction(event -> {
+		//EIL
 			EventInfo evInfo = new EventInfo(Double.parseDouble(eventIntensity.getText()) );
 			evInfo.setEventName(eventNameExecutionComboBox.getSelectionModel().getSelectedItem());
 			evInfo.setAgent(agentNameExecutionEventComboBox.getSelectionModel().getSelectedItem());
@@ -395,50 +542,7 @@ public class MainController{
 			eventReactionRepo.save(evReaction);
 		//	eventNameExecutionComboBox.setItems(FXCollections.observableArrayList(eventNameRepo.findAll()));
 		});
-		generateGoalExecution.setOnAction(event -> {
-			List<GoalInfo> goalInfos = new LinkedList<>();
-			for(Agent agent: agentRepo.findAll())
-			{
-				for(GoalName goalName: goalNameRepo.findAll())
-				{
-				GoalInfo goalInfo = new GoalInfo();
-				Random r = new Random();
-				double randomValue = r.nextDouble();
-				goalInfo.setWeight(randomValue);
-				goalInfo.setAgent(agent);
-				goalInfo.setGoalName(goalName);
-				goalInfos.add(goalInfo);
-				}
-			}
-			goalInfoRepo.deleteAll();
-			goalInfoRepo.saveAll(goalInfos);
-		});
-		generateEventExecution.setOnAction(event -> {
-			List<EventInfo> listEventInfo = new LinkedList<>();
-			List<EventReaction> listEventReaction = new LinkedList<>();
-			for(Agent agent : agentNameExecutionEventComboBox.getItems())
-			{
-				for(EventName eventName : eventNameComboBox.getItems())
-				{
-					EventInfo eventInfo = new EventInfo();
-					eventInfo.setAgent(agent);
-					Random r = new Random();
-					double randomValue = r.nextDouble();
-					eventInfo.setEventIntensityLevel(randomValue);
-					eventInfo.setEventName(eventName);
-					listEventInfo.add(eventInfo);
-					EventReaction eventReaction = new EventReaction("event reaction");
-					eventReaction.setEventInfo(eventInfo);
-					listEventReaction.add(eventReaction);
-				}
-			}
-			eventReactionRepo.deleteAll();
-			eventInfoRepo.deleteAll();
-			
-			eventInfoRepo.saveAll(listEventInfo);
-			eventReactionRepo.saveAll(listEventReaction);
-			
-		});
+
 		
 		saveAgent.setOnAction(event -> {
 			if (validateAgent()) {
