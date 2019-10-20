@@ -29,11 +29,12 @@ public class EventName {
 		this.eventDegree = eventDegree;
 	}
 
-	public EventName(String name, Boolean confirmed, Boolean eventDegree) {
+	public EventName(String name, Boolean prospected, Boolean confirmed, Boolean eventDegree) {
 		super();
 		this.name = name;
 		this.confirmed = confirmed;
 		this.eventDegree = eventDegree;
+		this.prospected = prospected;
 	}
 	private Boolean confirmed;
 

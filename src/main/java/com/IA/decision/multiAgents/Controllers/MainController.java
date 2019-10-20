@@ -212,11 +212,21 @@ public class MainController{
 			{
 				for(EventName eventName : eventNameComboBox.getItems())
 				{
-
+					//EIL
+				
 					EventInfo eventInfo = new EventInfo();
 					eventInfo.setAgent(agent);
-					double randomValue = Math.round(ThreadLocalRandom.current().nextDouble(0,1)* 100d) / 100d;
+					double randomValue = 0;
+					if(OCEANRepo.findByAgent(agent).getNeuroticism()>=0.5)
+					{
+					 randomValue = Math.round(ThreadLocalRandom.current().nextDouble(0.5,1)* 100d) / 100d;
+					}
+					else
+					{
+						 randomValue = Math.round(ThreadLocalRandom.current().nextDouble(0,0.5)* 100d) / 100d;
+					}
 					eventInfo.setEventIntensityLevel(randomValue);
+					
 					eventInfo.setEventName(eventName);
 					listEventInfo.add(eventInfo);
 					EventReaction eventReaction = new EventReaction();
@@ -301,8 +311,16 @@ public class MainController{
 				{
 				GoalInfo goalInfo = new GoalInfo();
 				//goal weight
-				double randomValue = Math.round(ThreadLocalRandom.current().nextDouble(0,1)* 100d) / 100d;
-				goalInfo.setWeight(randomValue);
+				double goalWeight = 0;
+
+				if(OCEANRepo.findByAgent(agent).getConscientiousness() >=0.5)
+				{
+				goalWeight = Math.round(ThreadLocalRandom.current().nextDouble(0.5 , 1)* 100d) / 100d;
+				}
+				else {
+				goalWeight = Math.round(ThreadLocalRandom.current().nextDouble(0,0.5)* 100d) / 100d; 
+				}
+				goalInfo.setWeight(goalWeight);
 				goalInfo.setAgent(agent);
 				goalInfo.setGoalName(goalName);
 				goalInfos.add(goalInfo);
@@ -319,16 +337,16 @@ public class MainController{
 			goalNameRepo.save(goalName);
 
 			List<EventName> eventNames = new LinkedList<>();				
-			EventName eventName = new EventName("Bad mark",true,false);
+			EventName eventName = new EventName("Bad mark",false,true,false);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
-			eventName = new EventName("Prospect bad mark", false, false);
+			eventName = new EventName("Prospect bad mark", true,false, false);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
-			eventName = new EventName("Good mark", true, true);
+			eventName = new EventName("Good mark", false, true, true);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
-			eventName = new EventName("Prospect good mark", true, true);
+			eventName = new EventName("Prospect good mark",true, true, true);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
 			eventNameRepo.saveAll(eventNames);
@@ -349,6 +367,28 @@ public class MainController{
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
 			eventNameRepo.saveAll(eventNames);
+			
+			goalName = new GoalName("Appreciation");
+			goalNameRepo.save(goalName);
+			eventNames.clear();				
+		
+			eventName = new EventName("Negative feedback",true,false);
+			eventName.setGoalName(goalName);
+			eventNames.add(eventName);
+			eventName = new EventName("Positive feedback",true,false);
+			eventName.setGoalName(goalName);
+			eventNames.add(eventName);
+			eventNameRepo.saveAll(eventNames);
+			
+			goalName = new GoalName("Social growth");
+			goalNameRepo.save(goalName);
+			eventNames.clear();	
+			eventName = new EventName("Asking for help (Other) ",true,false);
+			eventName.setGoalName(goalName);
+			eventNames.add(eventName);
+			eventNameRepo.saveAll(eventNames);
+			
+
 			goalNameComboBox.setItems(FXCollections.observableArrayList(goalNameRepo.findAll()));
 			eventNameComboBox.setItems(FXCollections.observableArrayList(eventNames));
 			goalExecutionComboBox.setItems(FXCollections.observableArrayList(goalNameRepo.findAll()));
@@ -520,7 +560,7 @@ public class MainController{
 			});
 		
 		addEventExecution.setOnAction(event -> {
-		//EIL
+	
 			EventInfo evInfo = new EventInfo(Double.parseDouble(eventIntensity.getText()) );
 			evInfo.setEventName(eventNameExecutionComboBox.getSelectionModel().getSelectedItem());
 			evInfo.setAgent(agentNameExecutionEventComboBox.getSelectionModel().getSelectedItem());
