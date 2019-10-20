@@ -201,10 +201,10 @@ public class MainController{
 		generateEventExecution.setOnAction(event -> {
 			List<EventInfo> listEventInfo = new LinkedList<>();
 			List<EventReaction> listEventReaction = new LinkedList<>();
+			//if we implement the K factor EIL*C then we may use those two lists
 			List<EventReaction> listPositiveReaction = new LinkedList<>();
 			listPositiveReaction.add(new EventReaction("Asking for help"));
 			listPositiveReaction.add(new EventReaction("High effort"));
-			
 			List<EventReaction> listNegativeReaction = new LinkedList<>();
 			listNegativeReaction.add(new EventReaction("Asking for help"));
 			listNegativeReaction.add(new EventReaction("Giving up"));
@@ -252,6 +252,45 @@ public class MainController{
 							}
 						}
 					}
+					if(eventName.getGoalName().getName().equals("Appreciation"))
+					{	
+								if(eventName.getEventDegree())
+								{
+									eventReaction.setEventReaction("Finish the proposed activity ");
+								}
+								else 
+								{ 
+								
+								if(OCEANRepo.findByAgent(agent).getConscientiousness()>=0.5)
+									{
+										
+									eventReaction.setEventReaction("Improve level of competence");									
+									}
+									else
+									{
+										
+										eventReaction.setEventReaction("Asking for help");
+									}
+								
+								}
+
+				}
+//				if(eventName.getGoalName().getName().equals("Social growth"))
+//				{		
+//										
+//												if(OCEANRepo.findByAgent(agent).getAgreeableness()>=0.5)
+//												{
+//													
+//														eventReaction.setEventReaction("Accepting help");
+//													
+//												}
+//												else
+//												{
+//													
+//													eventReaction.setEventReaction("Rejecting help");
+//												}
+//											
+//											}
 						eventReaction.setEventInfo(eventInfo);
 						listEventReaction.add(eventReaction);
 					}
@@ -337,45 +376,50 @@ public class MainController{
 			goalNameRepo.save(goalName);
 
 			List<EventName> eventNames = new LinkedList<>();				
-			EventName eventName = new EventName("Bad mark",false,true,false);
+			EventName  eventName = new EventName("Prospect bad mark", true,false, false);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
-			eventName = new EventName("Prospect bad mark", true,false, false);
+			eventName = new EventName("Bad mark",false,true,false);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
+			
+			eventName = new EventName("Prospect good mark",true, false, true);
+			eventName.setGoalName(goalName);
+			eventNames.add(eventName);
+			
 			eventName = new EventName("Good mark", false, true, true);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
-			eventName = new EventName("Prospect good mark",true, true, true);
-			eventName.setGoalName(goalName);
-			eventNames.add(eventName);
+		
 			eventNameRepo.saveAll(eventNames);
 			
 			goalName = new GoalName("Success the year");
 			goalNameRepo.save(goalName);
-			eventNames.clear();				
-			eventName = new EventName("Failing the activities",true,false);
+			eventNames.clear();		
+			eventName = new EventName("Prospect failing the activities",true, false, false);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
-			eventName = new EventName("Prospect failing the activities", false, false);
+			eventName = new EventName("Failing the activities",false,false,true);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
-			eventName = new EventName("Have success the activities", true, true);
+		
+			eventName = new EventName("Prospect success the activities", true, false, true);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
-			eventName = new EventName("Prospect success the activities", false, true);
+			eventName = new EventName("Have success the activities",false, true, true);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
+		
 			eventNameRepo.saveAll(eventNames);
 			
 			goalName = new GoalName("Appreciation");
 			goalNameRepo.save(goalName);
 			eventNames.clear();				
 		
-			eventName = new EventName("Negative feedback",true,false);
+			eventName = new EventName("Negative feedback",false,true,false);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
-			eventName = new EventName("Positive feedback",true,false);
+			eventName = new EventName("Positive feedback",false,true,false);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
 			eventNameRepo.saveAll(eventNames);
@@ -383,7 +427,7 @@ public class MainController{
 			goalName = new GoalName("Social growth");
 			goalNameRepo.save(goalName);
 			eventNames.clear();	
-			eventName = new EventName("Asking for help (Other) ",true,false);
+			eventName = new EventName("Asking for help (Other) ",false,true,false);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
 			eventNameRepo.saveAll(eventNames);
@@ -467,7 +511,7 @@ public class MainController{
 			goalNameComboBox.setItems(FXCollections.observableArrayList(goalNameRepo.findAll()));
 		});
 		addEventName.setOnAction(event -> {
-			EventName evName = new EventName(eventName.getText(), confirmCheckBox.isSelected(),degreeCheckBox.isSelected());
+			EventName evName = new EventName(eventName.getText(), false,confirmCheckBox.isSelected(),degreeCheckBox.isSelected());
 			evName.setGoalName(goalNameComboBox.getSelectionModel().getSelectedItem());
 			eventNameComboBox.getItems().add(evName);
 			eventNameExecutionComboBox.getItems().add(evName);

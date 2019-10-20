@@ -78,9 +78,15 @@ public class OCC {
 	public void setPity(List<OCCsTowardsAgent> pity) {
 		this.pity = pity;
 	}
+	@OneToMany
+	private List<OCCsTowardsAgent> admiration;
+
 
 	@OneToMany
+	private List<OCCsTowardsAgent> reproach;
+	@OneToMany
 	private List<OCCsTowardsAgent> happyFor;
+
 	@OneToMany
 	private List<OCCsTowardsAgent> sorryFor;
 	@OneToMany
@@ -137,5 +143,17 @@ public class OCC {
 	}
 	public void setRelief(double relief) {
 		this.relief = relief;
+	}
+	public List<OCCsTowardsAgent> getAdmiration() {
+		return admiration;
+	}
+	public void setAdmiration(List<OCCsTowardsAgent> admiration) {
+		this.admiration = admiration;
+	}
+	public List<OCCsTowardsAgent> getReproach() {
+		return reproach;
+	}
+	public void setReproach(List<OCCsTowardsAgent> reproach) {
+		this.reproach = reproach;
 	}
 }
