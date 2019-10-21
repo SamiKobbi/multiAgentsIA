@@ -16,7 +16,7 @@ import com.IA.decision.multiAgents.config.ApplicationContextProvider;
 import com.IA.decision.multiAgents.repositories.ActionRepository;
 import com.IA.decision.multiAgents.repositories.AgentRepository;
 import com.IA.decision.multiAgents.repositories.EventNameRepository;
-
+import com.IA.decision.multiAgents.repositories.OCCRepository;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -59,17 +59,19 @@ public class Diffuseur extends Agent {
 		 AgentRepository agentRepo = ApplicationContextProvider.getApplicationContext().getBean(AgentRepository.class);
 		 EventNameRepository eventNameRepo = ApplicationContextProvider.getApplicationContext().getBean(EventNameRepository.class);
 		 ActionRepository actionRepo = ApplicationContextProvider.getApplicationContext().getBean(ActionRepository.class);
-			
+		 OCCRepository occRepo = ApplicationContextProvider.getApplicationContext().getBean(OCCRepository.class);
+				
 		public void action() {
 		
 			 logger.info("<Diffuseur Agent: searching for events from the network>");
 		
 			try {
+					occRepo.deleteAll();
 					List<com.IA.decision.multiAgents.BO.Agent> agents = agentRepo.findAll();
 					List<EventName> events = eventNameRepo.findAll();
 					for(com.IA.decision.multiAgents.BO.EventName event:events)
 					{
-						logger.info("<Diffuseur Agent>: Diffusing message id:"+event.getId()+" event:"+event.getName());
+						logger.info("<Diffuseur Agent>: Diffusing message id:"+event.getId()+"___event:"+event.getName());
 						ACLMessage msg3= new ACLMessage(ACLMessage.INFORM) ;
 						msg3.setContent("event:"+event.getId().toString());
 						for(com.IA.decision.multiAgents.BO.Agent agent : agents)

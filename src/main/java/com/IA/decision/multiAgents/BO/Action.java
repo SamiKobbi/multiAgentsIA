@@ -11,7 +11,7 @@ import javax.persistence.OneToOne;
 public class Action {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	public Long getId() {
 		return id;

@@ -168,7 +168,7 @@ public class AgentTemplate extends Agent {
 			OCC occ;
 			
 			double newNegOCC = 0, newPosOCC = 0;
-			logger.info("Updating OCC agent: "+ agentSrc.getName()+" occUpdate: "+occUpdate+" event degree : "+eventDegree);
+			logger.info("Updating OCC agent: "+ agentSrc.getName()+" occUpdate: "+occUpdate+" event degree : "+eventDegree + ",emotional couple:"+emotionType);
 			
 			if (!optocc.isPresent()) {
 				occ = new OCC();
@@ -312,38 +312,44 @@ public class AgentTemplate extends Agent {
 			{
 				occ.setJoy(newPosOCC);
 				occ.setDistress(newNegOCC);
-				
+				occ.setAgent(agentSrc);
+				OCCRepo.save(occ);
 			}
 			else if(emotionType.equals("hope/fear") )
 			{
 				occ.setHope(newPosOCC);
 				occ.setFear(newNegOCC);
+				occ.setAgent(agentSrc);
+				OCCRepo.save(occ);
 			}
 			else if(emotionType.equals("satisfaction/fear confirmed") )
 			{
 				occ.setSatisfaction(newPosOCC);
 				occ.setFearConfirmed(newNegOCC);
+				occ.setAgent(agentSrc);
+				OCCRepo.save(occ);
 			}
 			else if(emotionType.equals("relief/disappointment") )
 			{
 				occ.setRelief(newPosOCC);
 				occ.setDisappointment(newNegOCC);
+				occ.setAgent(agentSrc);
+				OCCRepo.save(occ);
 			}	
 			else if(emotionType.equals("pity/gloating") )
 			{
 				OCCsTowardsAgent pityTowardsAgent = getOCCTowardsAgent(occ.getPity(),likingTowardsAgent.getAgentDest());
-				OCCsTowardsAgent gloatingTowardsAgent = getOCCTowardsAgent(occ.getGloating(),likingTowardsAgent.getAgentDest());
+			
 				pityTowardsAgent.setOCCValue(newPosOCC);
 				occTowardsAgentRepo.save(pityTowardsAgent);
-				List<OCCsTowardsAgent> pityTowardsAgentList = occ.getPity();
-				pityTowardsAgentList.add(pityTowardsAgent);
-				occ.setPity(pityTowardsAgentList);
+			
 				
+				OCCsTowardsAgent gloatingTowardsAgent = getOCCTowardsAgent(occ.getGloating(),likingTowardsAgent.getAgentDest());
 				gloatingTowardsAgent.setOCCValue(newNegOCC);
 				occTowardsAgentRepo.save(gloatingTowardsAgent);
-				List<OCCsTowardsAgent> gloatingTowardsAgentList = occ.getGloating();
-				gloatingTowardsAgentList.add(gloatingTowardsAgent);
-				occ.setGloating(gloatingTowardsAgentList);
+				
+			
+				
 			}	
 			else if (emotionType.equals("happyFor/sorryFor") )
 			{
@@ -351,40 +357,36 @@ public class AgentTemplate extends Agent {
 				OCCsTowardsAgent sorryForTowardsAgent = getOCCTowardsAgent(occ.getSorryFor(),likingTowardsAgent.getAgentDest());
 				happyForTowardsAgent.setOCCValue(newPosOCC);
 				occTowardsAgentRepo.save(happyForTowardsAgent);
-				List<OCCsTowardsAgent> happyForTowardsAgentList = occ.getHappyFor();
-				happyForTowardsAgentList.add(happyForTowardsAgent);
-				occ.setHappyFor(happyForTowardsAgentList);
 				
+			
 				sorryForTowardsAgent.setOCCValue(newNegOCC);
 				occTowardsAgentRepo.save(sorryForTowardsAgent);
-				List<OCCsTowardsAgent> sorryForTowardsAgentList = occ.getSorryFor();
-				sorryForTowardsAgentList.add(sorryForTowardsAgent);
-				occ.setSorryFor(sorryForTowardsAgentList);
+				
+	
 			}
 			else if (emotionType.equals("admiration/reproach") )
 			{
 				OCCsTowardsAgent admirationTowardsAgent = getOCCTowardsAgent(occ.getAdmiration(),agentDest);
 				admirationTowardsAgent.setOCCValue(newPosOCC);
 				occTowardsAgentRepo.save(admirationTowardsAgent);
-				List<OCCsTowardsAgent> admirationTowardsAgentList = occ.getAdmiration();
-				admirationTowardsAgentList.add(admirationTowardsAgent);
-				occ.setAdmiration(admirationTowardsAgentList);
 				
+				
+				
+		
 				OCCsTowardsAgent reproachTowardsAgent = getOCCTowardsAgent(occ.getReproach(),agentDest);
 				reproachTowardsAgent.setOCCValue(newPosOCC);
 				occTowardsAgentRepo.save(reproachTowardsAgent);
-				List<OCCsTowardsAgent> reproachTowardsAgentList = occ.getReproach();
-				reproachTowardsAgentList.add(reproachTowardsAgent);
-				occ.setReproach(reproachTowardsAgentList);
 				
+			
 			}
 			else if( emotionType.equals("pride/shame"))
 			{
 				occ.setProud(newPosOCC);
 				occ.setShame(newNegOCC);
+				occ.setAgent(agentSrc);
+				OCCRepo.save(occ);
 			}
-			occ.setAgent(agentSrc);
-			OCCRepo.save(occ);
+		
 		}
 		
 		private static final long serialVersionUID = 1L;
@@ -416,12 +418,20 @@ public class AgentTemplate extends Agent {
 				Long agentId = agentRepo.findAll().stream().filter(agent -> agent.getName().equals(getLocalName()))
 						.findAny().get().getId();
 				Optional<EventName> eventName = eventNameRepo.findById(Long.parseLong((message.split(":"))[1]));
-				EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent( agentId, eventName.get().getId());
+				if(eventName.isPresent())
+				{
+					
+				
+				Optional<EventInfo> eventInfoOpt = eventInfoRepo.findByEventNameAndAgent( agentId, eventName.get().getId());
+				if(eventInfoOpt.isPresent())
+				{
+				EventInfo eventInfo = eventInfoOpt.get();
+				
 				Optional<com.IA.decision.multiAgents.BO.Agent> agent = agentRepo.findById(agentId);
-				Optional<OCC> optocc = OCCRepo.findByAgent(agent.get());
+				Optional<OCC> optocc ;
 				if (msgType.equals("event")) {
 					logger.info(
-							getLocalName()+ " received event message id: " +(message.split(":"))[1]+" event name:" + msg2.getContent() );
+							getLocalName()+ " received event message id: " +(message.split(":"))[1]+" event name:" + eventName.get().getName() );
 
 					
 					GoalInfo goalInfo = goalInfoRepo.findByGoalNameAndAgent(agentId,eventName.get().getGoalName().getId()
@@ -435,22 +445,22 @@ public class AgentTemplate extends Agent {
 					Double desirability = eventInfo.getEventIntensityLevel() * goalInfo.getWeight();
 					
 					if(eventName.get().getProspected())
-					{
+					{	optocc = OCCRepo.findByAgent(agent.get());
 						int likelihood  = eventName.get().getLikelihood();
 						updateOCCVector("hope/fear", optocc, agent.get() ,null, null, likelihood*0.25*desirability , eventName.get().getEventDegree());	
-						eventName.get().setLikelihood(likelihood+1);
-						eventNameRepo.save(eventName.get());
+					
 					}
 					else
 					{
 						if(eventName.get().getConfirmed())
 						{
-							
+						optocc = OCCRepo.findByAgent(agent.get());
 						updateOCCVector("joy/distress", optocc, agent.get() ,null,null, desirability , eventName.get().getEventDegree());
-							
+						 optocc = OCCRepo.findByAgent(agent.get());	
 						updateOCCVector("satisfaction/fear confirmed", optocc, agent.get() ,null,null, desirability , eventName.get().getEventDegree());
 						}
 						else {
+							 optocc = OCCRepo.findByAgent(agent.get());
 						updateOCCVector("disappointment/relief", optocc, agent.get() ,null, null, desirability , eventName.get().getEventDegree());
 							
 								
@@ -461,7 +471,9 @@ public class AgentTemplate extends Agent {
 				
 					for(LikingTowardsAgent likingTowardAgent: agent.get().getLikingTowardAgent())
 					{
+						optocc = OCCRepo.findByAgent(agent.get());
 						updateOCCVector("happyFor/sorryFor", optocc, agent.get() , null, likingTowardAgent, desirability*likingTowardAgent.getLikingValue() , eventName.get().getEventDegree());
+						optocc = OCCRepo.findByAgent(agent.get());
 						updateOCCVector("pity/gloating", optocc, agent.get() ,null, likingTowardAgent, desirability*likingTowardAgent.getLikingValue() , eventName.get().getEventDegree());
 					}
 					
@@ -488,9 +500,11 @@ public class AgentTemplate extends Agent {
 				}
 				else if (msgType.equals("eventReaction"))
 				{
-					logger.info( getLocalName()+" received event message reaction : " + msg2.getContent() + " from "+ msg2.getSender().getLocalName());
 					Long idEventReaction = Long.parseLong((message.split(":"))[1]);
 					Optional<EventReaction> eventReaction = eventReactionRepo.findById(idEventReaction);
+					logger.info( getLocalName()+" received event message reaction : " + eventReaction.get().getReactionName() + " from "+ msg2.getSender().getLocalName());
+					
+					
 					if(eventReaction.get().getReactionName().equals("Asking for help"))
 					{
 						Action action =  new Action();
@@ -515,6 +529,7 @@ public class AgentTemplate extends Agent {
 						Action savedAction = actionRepo.save(action);
 						double blamePraiseWorthy=0;
 						blamePraiseWorthy = action.getApprovalDegreeLevel();
+						optocc = OCCRepo.findByAgent(agent.get());
 						updateOCCVector("pride/shame", optocc,agent.get(), action.getAgentDest() ,null, blamePraiseWorthy , eventName.get().getEventDegree());
 
 						//diffuse
@@ -539,10 +554,11 @@ public class AgentTemplate extends Agent {
 					double blamePraiseWorthyForOther=0;
 					Boolean actionDegree = action.get().getActionDegree();
 					blamePraiseWorthyForOther = eventInfo.getEventIntensityLevel();
+					optocc = OCCRepo.findByAgent(agent.get());
 					updateOCCVector("admiration/reproach", optocc, agent.get() ,action.get().getAgentDest(),null, blamePraiseWorthyForOther , actionDegree);
 				
 					logger.info(
-							getLocalName()+ " received " + msg2.getContent() + " from Sender : " + msg2.getSender().getLocalName());
+							getLocalName()+ " received " + action.get().getMessage() + " from Sender : " + msg2.getSender().getLocalName());
 			
 					//praise worthy
 					//blame worthy
@@ -554,6 +570,19 @@ public class AgentTemplate extends Agent {
 					//p++;
 				}
 			}
+				else
+				{
+					logger.info("event info is present for agent ID:"+agentId +"eventID" +eventName.get().getId());
+				}
+			}
+				else
+				{
+					logger.info("execution is finished successfully");
+
+				}
+			}
+		
+			
 		}
 
 		public boolean done() {

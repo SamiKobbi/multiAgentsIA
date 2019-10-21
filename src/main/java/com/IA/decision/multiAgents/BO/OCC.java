@@ -1,14 +1,20 @@
 package com.IA.decision.multiAgents.BO;
 
+import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 public class OCC {
@@ -78,21 +84,27 @@ public class OCC {
 	public void setPity(List<OCCsTowardsAgent> pity) {
 		this.pity = pity;
 	}
-	@OneToMany
-	private List<OCCsTowardsAgent> admiration;
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<OCCsTowardsAgent> admiration = new LinkedList<>();
 
 
-	@OneToMany
-	private List<OCCsTowardsAgent> reproach;
-	@OneToMany
-	private List<OCCsTowardsAgent> happyFor;
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<OCCsTowardsAgent> reproach = new LinkedList<>();;
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<OCCsTowardsAgent> happyFor = new LinkedList<>();;
 
-	@OneToMany
-	private List<OCCsTowardsAgent> sorryFor;
-	@OneToMany
-	private List<OCCsTowardsAgent> gloating;
-	@OneToMany
-	private List<OCCsTowardsAgent> pity;
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<OCCsTowardsAgent> sorryFor = new LinkedList<>();;
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<OCCsTowardsAgent> gloating = new LinkedList<>();;
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<OCCsTowardsAgent> pity = new LinkedList<>();
 	
 	public double getShame() {
 		return shame;

@@ -1,10 +1,13 @@
 package com.IA.decision.multiAgents.BO;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 public class EventName {
@@ -24,6 +27,7 @@ public class EventName {
 	public Boolean getEventDegree() {
 		return eventDegree;
 	}
+	@ColumnDefault("1")
 	private int likelihood;
 	public void setEventDegree(Boolean eventDegree) {
 		this.eventDegree = eventDegree;

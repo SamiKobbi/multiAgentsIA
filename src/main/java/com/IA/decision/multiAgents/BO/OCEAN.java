@@ -3,6 +3,7 @@ package com.IA.decision.multiAgents.BO;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -19,7 +20,7 @@ public class OCEAN {
 	private Double extraversion;
 	private Double agreeableness;
 	private Double neuroticism;
-	@OneToOne
+	@OneToOne(cascade=CascadeType.ALL,  fetch = FetchType.EAGER)
 	private Agent agent;
 	
 	public OCEAN()

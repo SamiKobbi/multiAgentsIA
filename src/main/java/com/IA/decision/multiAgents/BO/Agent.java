@@ -2,7 +2,9 @@ package com.IA.decision.multiAgents.BO;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,7 +17,8 @@ public class Agent {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	@OneToMany
+	//FetchType.EAGER load all children(likingtowardAgent) when loading Agent
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<LikingTowardsAgent> likingTowardAgent;
 	
 	public List<LikingTowardsAgent> getLikingTowardAgent() {

@@ -1,10 +1,13 @@
 package com.IA.decision.multiAgents.Controllers;
 
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -208,9 +211,9 @@ public class MainController{
 			List<EventReaction> listNegativeReaction = new LinkedList<>();
 			listNegativeReaction.add(new EventReaction("Asking for help"));
 			listNegativeReaction.add(new EventReaction("Giving up"));
-			for(Agent agent : agentNameExecutionEventComboBox.getItems())
+			for(Agent agent : agentRepo.findAll())
 			{
-				for(EventName eventName : eventNameComboBox.getItems())
+				for(EventName eventName : eventNameRepo.findAll())
 				{
 					//EIL
 				
@@ -223,7 +226,7 @@ public class MainController{
 					}
 					else
 					{
-						 randomValue = Math.round(ThreadLocalRandom.current().nextDouble(0,0.5)* 100d) / 100d;
+						 randomValue = Math.round(ThreadLocalRandom.current().nextDouble(0.15,0.5)* 100d) / 100d;
 					}
 					eventInfo.setEventIntensityLevel(randomValue);
 					
@@ -357,7 +360,7 @@ public class MainController{
 				goalWeight = Math.round(ThreadLocalRandom.current().nextDouble(0.5 , 1)* 100d) / 100d;
 				}
 				else {
-				goalWeight = Math.round(ThreadLocalRandom.current().nextDouble(0,0.5)* 100d) / 100d; 
+				goalWeight = Math.round(ThreadLocalRandom.current().nextDouble(0.15,0.5)* 100d) / 100d; 
 				}
 				goalInfo.setWeight(goalWeight);
 				goalInfo.setAgent(agent);
@@ -377,17 +380,20 @@ public class MainController{
 
 			List<EventName> eventNames = new LinkedList<>();				
 			EventName  eventName = new EventName("Prospect bad mark", true,false, false);
+			eventName.setLikelihood(1);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
 			eventName = new EventName("Bad mark",false,true,false);
 			eventName.setGoalName(goalName);
+			eventName.setLikelihood(1);
 			eventNames.add(eventName);
-			
 			eventName = new EventName("Prospect good mark",true, false, true);
+			eventName.setLikelihood(1);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
 			
 			eventName = new EventName("Good mark", false, true, true);
+			eventName.setLikelihood(1);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
 		
@@ -398,16 +404,19 @@ public class MainController{
 			eventNames.clear();		
 			eventName = new EventName("Prospect failing the activities",true, false, false);
 			eventName.setGoalName(goalName);
+			eventName.setLikelihood(1);
 			eventNames.add(eventName);
-			eventName = new EventName("Failing the activities",false,false,true);
+			eventName = new EventName("Failing the activities",false,false,false);
 			eventName.setGoalName(goalName);
 			eventNames.add(eventName);
 		
 			eventName = new EventName("Prospect success the activities", true, false, true);
 			eventName.setGoalName(goalName);
+			eventName.setLikelihood(1);
 			eventNames.add(eventName);
 			eventName = new EventName("Have success the activities",false, true, true);
 			eventName.setGoalName(goalName);
+			eventName.setLikelihood(1);
 			eventNames.add(eventName);
 		
 			eventNameRepo.saveAll(eventNames);
@@ -418,9 +427,11 @@ public class MainController{
 		
 			eventName = new EventName("Negative feedback",false,true,false);
 			eventName.setGoalName(goalName);
+			eventName.setLikelihood(1);
 			eventNames.add(eventName);
 			eventName = new EventName("Positive feedback",false,true,false);
 			eventName.setGoalName(goalName);
+			eventName.setLikelihood(1);
 			eventNames.add(eventName);
 			eventNameRepo.saveAll(eventNames);
 			
@@ -429,6 +440,7 @@ public class MainController{
 			eventNames.clear();	
 			eventName = new EventName("Asking for help (Other) ",false,true,false);
 			eventName.setGoalName(goalName);
+			eventName.setLikelihood(1);
 			eventNames.add(eventName);
 			eventNameRepo.saveAll(eventNames);
 			
@@ -449,6 +461,9 @@ public class MainController{
 					fileWriter = new FileWriter(currentDir.toAbsolutePath().toString()+"/start.txt");
 					  fileWriter.write("go");
 					    fileWriter.close();
+					    Files.copy(Paths.get("C:\\folderOCC\\excelSheetOCC.xlsx"), Paths.get("C:\\folderOCC\\excelSheetOCCValue.xlsx"));
+						 File file = new File("C:\\folderOCC\\excelSheetOCCValue.xlsx");
+						 file.setLastModified(new Date().getTime());
 				} catch (IOException e) {
 					logger.error(e);
 					// TODO Auto-generated catch block
@@ -529,6 +544,10 @@ public class MainController{
 		});
 
 		generateAgents.setOnAction(event -> {
+			OCEANRepo.deleteAll();
+			agentRepo.deleteAll();
+			likingTowardsAgentRepo.deleteAll();
+			
 			List<Agent> agents = new LinkedList<> ();
 			List<OCEAN> occeans = new LinkedList<>();
 			//génération automatique de N(N=40)  agents 
@@ -554,19 +573,24 @@ public class MainController{
 				occeans.add(ocean);
 				
 			}
+			OCEANRepo.saveAll(occeans);
+			agentRepo.saveAll(agents);
+		
+			//insertion de nouvelles valeurs
+			
 			//Initialisation de Liking Towards Agent  
 			LinkedList<LikingTowardsAgent> likingTowardsAgentList = new LinkedList<>();
-			for(Agent agentSrc: agents)
+			for(Agent agentSrc: agentRepo.findAll())
 			{
 				//récuperation de AgentSrc
 				likingTowardsAgentList.clear();
-				for(Agent agentDest: agents)
+				for(Agent agentDest: agentRepo.findAll())
 				{
-					//récuperation de AgentDest
-					if(agentSrc != agentDest)
+				//	récuperation de AgentDest
+					if(!agentSrc.getName().equals(agentDest.getName()))
 					{
 						LikingTowardsAgent likingTowardsAgent = new LikingTowardsAgent();
-						OCEAN ocean = OCEANRepo.findByAgent(agentSrc);
+						OCEAN ocean = occeans.stream().filter(oceanVect -> oceanVect.getAgent().getName().equals(agentSrc.getName()) ).findFirst().get();
 						 double likingValue=0;
 						if(ocean.getAgreeableness()>=0.5 || ocean.getExtraversion()>=0.5)
 						{
@@ -582,15 +606,18 @@ public class MainController{
 					}
 				}
 				agentSrc.setLikingTowardAgent(likingTowardsAgentList);
+				
+				likingTowardsAgentRepo.saveAll(likingTowardsAgentList);
+				
+				agentRepo.save(agentSrc);
 			}
+			
+			
+//			//likingTowardsAgentRepo.saveAll(likingTowardsAgentList);
+//			OCEANRepo.saveAll(occeans);
 			//suppression de valeurs anciennes
-			OCEANRepo.deleteAll();
-			agentRepo.deleteAll();
-			likingTowardsAgentRepo.deleteAll();
-			//insertion de nouvelles valeurs
-			agentRepo.saveAll(agents);
-			OCEANRepo.saveAll(occeans);
-			likingTowardsAgentRepo.saveAll(likingTowardsAgentList);
+	
+		
 			//mise à jour de la partie graphique
 			//Agents
 			agentsComboBox.setItems(FXCollections.observableArrayList(agents));
@@ -618,7 +645,7 @@ public class MainController{
 		updateEventExecution.setOnAction(event -> {
 			Agent agent = agentNameExecutionEventComboBox.getSelectionModel().getSelectedItem();
 			EventName eventName = eventNameExecutionComboBox.getSelectionModel().getSelectedItem();
-			EventInfo evInfo = eventInfoRepo.findByEventNameAndAgent(agent.getId(), eventName.getId());
+			EventInfo evInfo = eventInfoRepo.findByEventNameAndAgent(agent.getId(), eventName.getId()).get();
 			EventReaction evReaction = eventReactionRepo.findByEventInfo(evInfo);
 			evInfo.setEventIntensityLevel(Double.parseDouble(eventIntensity.getText()));
 			eventInfoRepo.save(evInfo);
@@ -751,7 +778,7 @@ public class MainController{
 				EventName eventNameExecution = eventNameExecutionComboBox.getSelectionModel().getSelectedItem();
 				if(eventNameExecution != null)
 				{
-					EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent(newValueAgent.getId(), eventNameExecution.getId() );
+					EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent(newValueAgent.getId(), eventNameExecution.getId() ).get();
 					if(eventInfo != null)
 					{
 					eventIntensity.setText(eventInfo.getEventIntensityLevel().toString());
@@ -771,7 +798,7 @@ public class MainController{
 				Agent agentExecution = agentNameExecutionEventComboBox.getSelectionModel().getSelectedItem();
 				if(agentExecution != null)
 				{
-					EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent(agentExecution.getId(), newEventNameExecution.getId());
+					EventInfo eventInfo = eventInfoRepo.findByEventNameAndAgent(agentExecution.getId(), newEventNameExecution.getId()).get();
 					if(eventInfo != null)
 					{
 					eventIntensity.setText(eventInfo.getEventIntensityLevel().toString());
