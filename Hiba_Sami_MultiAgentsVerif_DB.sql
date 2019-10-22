@@ -16,6 +16,7 @@ select * from occ where occ.id=114;
 select * from occ_sorry_for;
 select * from occs_towards_agent;
 
+--display event_execution
 select event_info.agent_id,goal_name.name,event_name.name,
 event_intensity_level,event_reaction.reaction_name,
 ocean.neuroticism, ocean.conscientiousness
@@ -25,5 +26,8 @@ inner join event_reaction on event_reaction.event_info_id=event_info.id
 inner join ocean on event_info.agent_id=ocean.agent_id
 order by agent_id ;
 
-
+--display occ vector with its corresponding values
 select * from occ;
+--display occ vector for an agent emotion towards other agent
+select occ.agent_id as agentSrcID ,agentDest.id as agentDestID, occs_towards_agent.occvalue as occValue  from occ_pity inner join occs_towards_agent  on occ_pity.pity_id=occs_towards_agent.id inner join agent agentDest 
+on occs_towards_agent.agent_dest_id=agentDest.id inner join occ on occ.id=occ_pity.occ_id;
