@@ -664,7 +664,7 @@ public class MainController {
 			seqLearn = new SequentialTransition();
 			LocalDateTime  currentTime = LocalDateTime.now();
 			Map<Agent, Circle> agentMap = createAgentPoint(agentList);
-			Map<Agent, int[][]> qMaxMatrix = initQmaxAgent(agentList);
+			Map<Agent, double[][]> qMaxMatrix = initQmaxAgent(agentList);
 			Map<Agent, Integer> agentRewards = generateAgentRewards(agentList);
 			for (Agent agent : agentMap.keySet()) {
 				drugLearningPane.getChildren().add(agentMap.get(agent));
@@ -678,7 +678,7 @@ public class MainController {
 						//logger.log(Level.INFO, "agent possible buyer {}", agentBuyer);
 							Random rand = new Random();
 							Agent agentConsumer =  agentConsumers.get(rand.nextInt(agentConsumers.size()));
-							int[][] qMaxAgent = qMaxMatrix.get(agentConsumer);
+							double[][] qMaxAgent = qMaxMatrix.get(agentConsumer);
 							OCC occ;
 							Optional<OCC> occOpt = allOCC.stream().filter(occAgent -> occAgent.getAgent().equals(agentConsumer)).findAny();
 							if(occOpt.isPresent()) {
@@ -1016,24 +1016,24 @@ public class MainController {
 		return agentDrugOccurence;
 
 	}
-	public Map<Agent, int[][]> initQmaxAgent(List<Agent> listAgent) {
-		Map<Agent, int[][]> qMaxAgent = new HashMap<Agent, int[][]>();
+	public Map<Agent, double[][]> initQmaxAgent(List<Agent> listAgent) {
+		Map<Agent, double[][]> qMaxAgent = new HashMap<Agent, double[][]>();
 		for (Agent agent : listAgent) {
-			int[][] qMaxAgentMatrix = new int [2][2];
-			qMaxAgentMatrix [0][0] = 0;
-			qMaxAgentMatrix [0][1] = 0;
-			qMaxAgentMatrix [0][0] = 0;
-			qMaxAgentMatrix [1][0] = 0;
+			double[][] qMaxAgentMatrix = new double [2][2];
+			qMaxAgentMatrix [0][0] = 0.0;
+			qMaxAgentMatrix [0][1] = 0.0;
+			qMaxAgentMatrix [0][0] = 0.0;
+			qMaxAgentMatrix [1][0] = 0.0;
 			qMaxAgent.put(agent, qMaxAgentMatrix);
 		}
 		return qMaxAgent;
 		
 	}
-	public int getQmaxAgent(Agent agent, Map<Agent, int[][]> qMaxAgent) {
-		int[][] qMaxMatrix = qMaxAgent.get(agent);
-		int qMax = 0;
+	public double getQmaxAgent(Agent agent, Map<Agent, double[][]> qMaxAgent) {
+		double[][] qMaxMatrix = qMaxAgent.get(agent);
+		double qMax = 0;
 		for(int i=0; i<qMaxMatrix.length; i++) {
-			int[] matrixLine = qMaxMatrix[i];
+			double[] matrixLine = qMaxMatrix[i];
 			for(int j=0; j < matrixLine.length; j++) {
 				if(qMax < matrixLine[j]) {
 					qMax = matrixLine[j];
@@ -1042,7 +1042,7 @@ public class MainController {
 		}
 		return qMax;
 	}
-	public void printQmaxMatrixAgent(Map<Agent, int[][]> qMaxMatrixAgent, List<Agent> agents) {
+	public void printQmaxMatrixAgent(Map<Agent, double[][]> qMaxMatrixAgent, List<Agent> agents) {
 		for(Agent agent: agents) {
 			logger.log(Level.INFO, "Agent {} Qmax {}", agent, getQmaxAgent(agent, qMaxMatrixAgent) );
 		}
