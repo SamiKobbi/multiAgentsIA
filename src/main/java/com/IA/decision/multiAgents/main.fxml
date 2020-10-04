@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.chart.*?>
 <?import java.lang.*?>
-<?import javafx.scene.*?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafxml_web.*?>
 
 <AnchorPane prefHeight="900.0" prefWidth="987.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.IA.decision.multiAgents.Controllers.MainController">
    <children>
@@ -90,7 +86,7 @@
                                     </Tab>
                                     <Tab text="Action">
                                        <content>
-                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="306.0" prefWidth="549.0">
+                                          <AnchorPane fx:id="leftAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="306.0" prefWidth="549.0">
                                              <children>
                                                 <TextField fx:id="actionMessage" layoutX="189.0" layoutY="42.0" prefHeight="12.0" prefWidth="222.0" />
                                                 <TextField fx:id="actionApprDegLvl" layoutX="176.0" layoutY="122.0" prefHeight="25.0" prefWidth="223.0" />
@@ -152,6 +148,37 @@
                      </children>
                   </AnchorPane>
               </content>
+            </Tab>
+            <Tab text="Drug Spreading">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <AnchorPane fx:id="drugSpreadingPane" layoutX="11.0" layoutY="14.0" minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="656.0" style="-fx-background-color: black;">
+                           <children>
+                              <TabPane layoutX="26.0" layoutY="20.0" prefHeight="377.0" prefWidth="611.0" tabClosingPolicy="UNAVAILABLE" />
+                              
+                           </children>
+                        </AnchorPane>
+                         <Button fx:id="generateDrugSpread" layoutX="506.0" layoutY="451.0" mnemonicParsing="false" text="Generate Spread Drug" />
+                        <Button fx:id="playSpreadDrug" layoutX="315.0" layoutY="451.0" mnemonicParsing="false" text="Play Spread Drug" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab text="Drug Learning">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <AnchorPane fx:id="drugLearningPane" layoutX="11.0" layoutY="14.0" minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="656.0" style="-fx-background-color: black;">
+                           <children>
+                              <TabPane layoutX="26.0" layoutY="20.0" prefHeight="377.0" prefWidth="611.0" tabClosingPolicy="UNAVAILABLE" />
+                           </children>
+                        </AnchorPane>
+                        <Button fx:id="generateDrugLearn" layoutX="506.0" layoutY="451.0" mnemonicParsing="false" text="Generate Learning Drug" />
+                        <Button fx:id="playDrugLearn" layoutX="315.0" layoutY="451.0" mnemonicParsing="false" text="Play Learning Drug" />
+                     </children>
+                  </AnchorPane>
+               </content>
             </Tab>
         </tabs>
       </TabPane>

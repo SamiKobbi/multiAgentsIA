@@ -18,7 +18,7 @@ import com.IA.decision.multiAgents.BO.EventInfo;
 import com.IA.decision.multiAgents.BO.EventName;
 import com.IA.decision.multiAgents.BO.EventReaction;
 import com.IA.decision.multiAgents.BO.GoalInfo;
-import com.IA.decision.multiAgents.BO.LikingTowardsAgent;
+import com.IA.decision.multiAgents.BO.EmotionTowardsAgent;
 import com.IA.decision.multiAgents.BO.OCC;
 import com.IA.decision.multiAgents.BO.OCCsTowardsAgent;
 import com.IA.decision.multiAgents.BO.OCEAN;
@@ -163,7 +163,7 @@ public class AgentTemplate extends Agent {
 			return occTowardsAgentDest;
 
 		}
-		private void updateOCCVector(String emotionType, Optional<OCC> optocc, com.IA.decision.multiAgents.BO.Agent agentSrc,com.IA.decision.multiAgents.BO.Agent agentDest, LikingTowardsAgent likingTowardsAgent,Double occUpdate, Boolean eventDegree)
+		private void updateOCCVector(String emotionType, Optional<OCC> optocc, com.IA.decision.multiAgents.BO.Agent agentSrc,com.IA.decision.multiAgents.BO.Agent agentDest, EmotionTowardsAgent emotionTowardsAgent ,Double occUpdate, Boolean eventDegree)
 		{
 			OCC occ;
 			
@@ -264,9 +264,9 @@ public class AgentTemplate extends Agent {
 					
 					if(!eventDegree)
 					{
-						double gloatingValue = 1-occUpdate*likingTowardsAgent.getLikingValue();
-						double pityValue = occUpdate*likingTowardsAgent.getLikingValue();
-						if(likingTowardsAgent.getLikingValue()==0)
+						double gloatingValue = 1-occUpdate*emotionTowardsAgent.getLikingValue();
+						double pityValue = occUpdate*emotionTowardsAgent.getLikingValue();
+						if(emotionTowardsAgent.getLikingValue()==0)
 						{
 							newPosOCC = 0;
 							newNegOCC = gloatingValue;
@@ -338,13 +338,13 @@ public class AgentTemplate extends Agent {
 			}	
 			else if(emotionType.equals("pity/gloating") )
 			{
-				OCCsTowardsAgent pityTowardsAgent = getOCCTowardsAgent(occ.getPity(),likingTowardsAgent.getAgentDest());
+				OCCsTowardsAgent pityTowardsAgent = getOCCTowardsAgent(occ.getPity(),emotionTowardsAgent.getAgentDest());
 			
 				pityTowardsAgent.setOCCValue(newPosOCC);
 				occTowardsAgentRepo.save(pityTowardsAgent);
 			
 				
-				OCCsTowardsAgent gloatingTowardsAgent = getOCCTowardsAgent(occ.getGloating(),likingTowardsAgent.getAgentDest());
+				OCCsTowardsAgent gloatingTowardsAgent = getOCCTowardsAgent(occ.getGloating(),emotionTowardsAgent.getAgentDest());
 				gloatingTowardsAgent.setOCCValue(newNegOCC);
 				occTowardsAgentRepo.save(gloatingTowardsAgent);
 				
@@ -353,8 +353,8 @@ public class AgentTemplate extends Agent {
 			}	
 			else if (emotionType.equals("happyFor/sorryFor") )
 			{
-				OCCsTowardsAgent happyForTowardsAgent = getOCCTowardsAgent(occ.getHappyFor(),likingTowardsAgent.getAgentDest());
-				OCCsTowardsAgent sorryForTowardsAgent = getOCCTowardsAgent(occ.getSorryFor(),likingTowardsAgent.getAgentDest());
+				OCCsTowardsAgent happyForTowardsAgent = getOCCTowardsAgent(occ.getHappyFor(),emotionTowardsAgent.getAgentDest());
+				OCCsTowardsAgent sorryForTowardsAgent = getOCCTowardsAgent(occ.getSorryFor(),emotionTowardsAgent.getAgentDest());
 				happyForTowardsAgent.setOCCValue(newPosOCC);
 				occTowardsAgentRepo.save(happyForTowardsAgent);
 				
@@ -469,7 +469,7 @@ public class AgentTemplate extends Agent {
 					//update occ values for the agent related to himself
 					//update occ values for other
 				
-					for(LikingTowardsAgent likingTowardAgent: agent.get().getLikingTowardAgent())
+					for(EmotionTowardsAgent likingTowardAgent: agent.get().getEmotionTowardAgent())
 					{
 						optocc = OCCRepo.findByAgent(agent.get());
 						updateOCCVector("happyFor/sorryFor", optocc, agent.get() , null, likingTowardAgent, desirability*likingTowardAgent.getLikingValue() , eventName.get().getEventDegree());

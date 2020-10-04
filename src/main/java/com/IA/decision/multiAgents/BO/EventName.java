@@ -1,25 +1,37 @@
 package com.IA.decision.multiAgents.BO;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.ColumnDefault;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class EventName {
 
 	@Id
+	@Column(name = "EVENT_NAME_ID")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	public Boolean prospected;
 	public Boolean getProspected() {
 		return prospected;
 	}
-
+	@JsonIgnore
+	@OneToMany(mappedBy = "eventName", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<EventInfo> eventInfo = new HashSet<>();
 	public void setProspected(Boolean prospected) {
 		this.prospected = prospected;
 	}
@@ -50,7 +62,8 @@ public class EventName {
 		this.confirmed = confirmed;
 	}
 	private String name;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "CATEGORY_ID")
 	private GoalName goalName;
 	
 	public Long getId() {

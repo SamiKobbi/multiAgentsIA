@@ -29,7 +29,6 @@ public class MultiAgentsApplication extends Application {
 	public void init() throws Exception {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder(MultiAgentsApplication.class);
 		context = builder.run(getParameters().getRaw().toArray(new String[0]));
-
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
 		loader.setControllerFactory(context::getBean);
 		rootNode = loader.load();

@@ -7,6 +7,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 @Entity
 public class OCEAN {
@@ -21,11 +22,15 @@ public class OCEAN {
 	private Double agreeableness;
 	private Double neuroticism;
 	@OneToOne(cascade=CascadeType.ALL,  fetch = FetchType.EAGER)
+	@JoinColumn(name = "AGENT_ID", referencedColumnName = "AGENT_ID")
 	private Agent agent;
 	
 	public OCEAN()
 	{
 		
+	}
+	public String toString() {
+		return "Openenss : " + openness +", neuroticism : "+neuroticism;
 	}
 	public OCEAN(Double openness,Double conscientiousness ,Double extraversion,Double agreeableness,Double neuroticism)
 	{

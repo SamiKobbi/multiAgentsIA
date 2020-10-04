@@ -1,9 +1,12 @@
 package com.IA.decision.multiAgents.BO;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
@@ -70,7 +73,8 @@ public class Action {
 	private Boolean actionDegree;
 	private Boolean requestOrResponse;
 	private Double approvalDegreeLevel;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "EVENT_REACTION_ID")
 	private EventReaction eventReaction;
 
 	public EventReaction getEventReaction() {
@@ -79,9 +83,11 @@ public class Action {
 	public void setEventReaction(EventReaction eventReaction) {
 		this.eventReaction = eventReaction;
 	}
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "agent_src_id", referencedColumnName = "AGENT_ID")
 	private Agent agentSrc;
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "agent_dest_id", referencedColumnName = "AGENT_ID")
 	private Agent agentDest;
 	
 }

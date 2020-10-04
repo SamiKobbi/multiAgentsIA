@@ -4,11 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
@@ -18,12 +20,14 @@ import org.hibernate.annotations.FetchMode;
 
 @Entity
 public class OCC {
+	
 	@Id
+	@Column(name = "OCC_ID")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-
 	@OneToOne
+	@JoinColumn(name = "AGENT_ID", referencedColumnName = "AGENT_ID")
 	private Agent agent;
 	
 
@@ -59,7 +63,8 @@ public class OCC {
 	private double fearConfirmed;
 	private double disappointment;
 	private double relief;
-
+	private double liking;
+	private double disliking;
 	public List<OCCsTowardsAgent> getHappyFor() {
 		return happyFor;
 	}
@@ -84,25 +89,29 @@ public class OCC {
 	public void setPity(List<OCCsTowardsAgent> pity) {
 		this.pity = pity;
 	}
-	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@Column(name = "admiration", nullable = false)
+	@OneToMany(mappedBy = "agentAdmiration", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<OCCsTowardsAgent> admiration = new LinkedList<>();
 
 
-	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "agentReproach", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.SUBSELECT)
-	private List<OCCsTowardsAgent> reproach = new LinkedList<>();;
-	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	private List<OCCsTowardsAgent> reproach = new LinkedList<>();
+	
+	@OneToMany(mappedBy = "agentHappyFor", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.SUBSELECT)
-	private List<OCCsTowardsAgent> happyFor = new LinkedList<>();;
+	private List<OCCsTowardsAgent> happyFor = new LinkedList<>();
 
-	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "agentSorryFor", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.SUBSELECT)
-	private List<OCCsTowardsAgent> sorryFor = new LinkedList<>();;
-	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	private List<OCCsTowardsAgent> sorryFor = new LinkedList<>();
+	
+	@OneToMany(mappedBy = "agentGloating", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.SUBSELECT)
-	private List<OCCsTowardsAgent> gloating = new LinkedList<>();;
-	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+	private List<OCCsTowardsAgent> gloating = new LinkedList<>();
+	
+	@OneToMany(mappedBy = "agentPity", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<OCCsTowardsAgent> pity = new LinkedList<>();
 	
@@ -168,4 +177,17 @@ public class OCC {
 	public void setReproach(List<OCCsTowardsAgent> reproach) {
 		this.reproach = reproach;
 	}
+	public double getLiking() {
+		return liking;
+	}
+	public void setLiking(double liking) {
+		this.liking = liking;
+	}
+	public double getDisliking() {
+		return disliking;
+	}
+	public void setDisliking(double disliking) {
+		this.disliking = disliking;
+	}
+
 }

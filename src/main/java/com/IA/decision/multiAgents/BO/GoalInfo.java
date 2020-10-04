@@ -1,10 +1,13 @@
 package com.IA.decision.multiAgents.BO;
 
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
@@ -37,9 +40,11 @@ public class GoalInfo {
 	}
 
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "AGENT_ID", referencedColumnName = "AGENT_ID")
 	private Agent agent;
-	@ManyToOne
+	 @ManyToOne(fetch = FetchType.LAZY)
+	  @JoinColumn(name = "GOAL_NAME_ID")
 	private GoalName goalName;
 
 	public GoalName getGoalName() {
